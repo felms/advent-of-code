@@ -3,18 +3,14 @@ defmodule Day01 do
   Dia 01 do Advento Of Code 2022
   """
 
-  # ======= Problema 01 - Encontra o Elfo que carrega mais calorias
+  # ======= Problema 01 - Encontrar o Elfo que carrega mais calorias
   def max_calories do
 
-    # Lê o arquivo
-    input = File.read!("./input.txt")
-
-    # Separa os 'Elfos'
-    elfs = String.split(input, "\n\n", trim: true)
-
+    # Lê o arquivo e separa os elfos
+    elves = File.read!("./input.txt") |> String.split("\n\n", trim: true)
 
     # Preenche a lista de somas
-    sums = Enum.map(elfs, fn elf -> parseItem(elf)  end)
+    sums = Enum.map(elves, fn elf -> parse_item(elf)  end)
 
     # Retorna o numero de calorias carregadas 
     # pelo elfo que carrega mais 
@@ -22,11 +18,29 @@ defmodule Day01 do
 
   end
 
-  # Função a ser aplicada nos itens de cada Elfo
-  defp parseItem(elf) do
+  # ======= Problema 02 - Encontrar os três Elfos que carregam mais calorias
+  def top_three_elves do
 
-    numbers = Enum.map(String.split(elf, "\n", trim: true), fn number -> String.to_integer(number) end)
-    Enum.sum(numbers)
+    # Lê o arquivo e separa os elfos
+    elves = File.read!("./input.txt") |> String.split("\n\n", trim: true)
+
+    # Preenche a lista de somas com os items ordenados
+    sums = Enum.sort(
+      Enum.map(elves, fn elf -> parse_item(elf)  end),
+      :desc
+    )
+
+    # Retorna a soma do top 3
+    Enum.slice(sums, 0..2) |> Enum.sum
+
+  end
+  
+
+  # ======= Utilitário - Calcula a soma dos itens de cada Elfo
+  defp parse_item(elf) do
+
+    Enum.map(String.split(elf, "\n", trim: true), fn number -> String.to_integer(number) end) 
+    |> Enum.sum
 
   end
 
