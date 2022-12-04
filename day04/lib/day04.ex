@@ -3,7 +3,29 @@ defmodule Day04 do
   Dia 04 do Advent of Code 2022
   """
 
-  # ======= Problema 01 - Contar as tarefas onde as seções se sobrepõem
+  # ======= Problema 01 - Contar as tarefas onde as seções estão inclusas uma na outra
+  def fully_overlapping_assignments do
+
+    File.read!("./input.txt")
+    |> String.split("\n", trim: true)
+    |> Enum.map(fn pair -> 
+      String.split(pair, ",", trim: true) 
+      |> Enum.map(fn item -> create_range(item) end)
+    end)
+    |> Enum.map(fn [range0, range1] -> 
+      r0 = MapSet.new(range0);
+      r1 = MapSet.new(range1);
+
+      cond do 
+        MapSet.subset?(r0, r1) or MapSet.subset?(r1, r0) -> 1
+        true -> 0
+      end
+    end)
+    |> Enum.sum
+
+  end
+
+  # ======= Problema 02 - Contar as tarefas onde as seções se sobrepõem
   def overlapping_assignments do
 
     File.read!("./input.txt")
@@ -12,16 +34,16 @@ defmodule Day04 do
       String.split(pair, ",", trim: true) 
       |> Enum.map(fn item -> create_range(item) end)
     end)
-    |> Enum.map(fn assignment -> 
+    |> Enum.map(fn [range0, range1] -> 
       cond do 
-        one_range_contains_other?(assignment) -> 1
-        true -> 0
+        MapSet.disjoint?(MapSet.new(range0), MapSet.new(range1)) -> 0
+        true -> 1
       end
-      end)
-      |> Enum.sum
+    end)
+    |> Enum.sum
   end
 
-  
+
   # ======= Utilitários
 
   # - Cria um 'range' com os limites dados
@@ -29,16 +51,6 @@ defmodule Day04 do
     [from, to] = String.split(item, "-", trim: true) 
                  |> Enum.map(fn number -> String.to_integer(number) end)
     Enum.to_list(from..to)
-  end
-
-  # - Testa se os 'ranges' estão contidos um no outro
-  defp one_range_contains_other?([range0, range1]) do
-
-    r0 = MapSet.new(range0);
-    r1 = MapSet.new(range1);
-
-    MapSet.subset?(r0, r1) or MapSet.subset?(r1, r0)
-
   end
 
 end
