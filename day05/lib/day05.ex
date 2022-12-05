@@ -16,27 +16,31 @@ defmodule Day05 do
     end)
 
     [crates, moves] = String.split(input, number_of_crates, trim: true)
-   _moves_list = String.split(moves, "\n", trim: true)
+    moves_list = String.split(moves, "\n", trim: true)
 
     parsed_crates = crates
-    |> String.split("\n", trim: true)
-    |> Enum.map(fn line ->
-      String.graphemes(line)
-      |> Enum.chunk_every(4)
-      |> Enum.map(fn chunk -> Enum.join(chunk) end)
-    end)
-    |> Enum.reverse
-    |> tl
+                    |> String.split("\n", trim: true)
+                    |> Enum.map(fn line ->
+                      String.graphemes(line)
+                      |> Enum.chunk_every(4)
+                      |> Enum.map(fn chunk -> Enum.join(chunk) end)
+                    end)
+                    |> Enum.reverse
+                    |> tl
 
     # {map_of_crates, parsed_crates, crate_labels, moves_list}
 
+    # [list | _ ] = parsed_crates
+    # fill_lists(map_of_crates, list)
 
-#    fill_lists(map_of_crates, list)
-#    map_of_crates
+    map_of_lists = parsed_crates
+    |> Enum.reduce(map_of_crates, fn item, acc -> 
+      fill_lists(acc, item) 
 
-    Enum.each(parsed_crates, fn item -> fill_lists(map_of_crates, item) end)
+    end)
 
-    map_of_crates
+
+    {map_of_lists, moves_list}
 
   end
 
@@ -45,11 +49,15 @@ defmodule Day05 do
 
     list
     |> Enum.with_index()
-    |> Enum.map(fn {element, index} ->
+    |> Enum.reduce(map_of_lists, fn {element, index}, acc ->
 
-      list = [element | Map.get(map_of_lists, index + 1)]
-      Map.replace(map_of_lists, index + 1, list)
-
+      cond do
+        String.trim(element) |> String.length > 0 -> 
+          list = [element | Map.get(map_of_lists, index + 1)]
+          Map.put(acc, index + 1, list)
+        true -> acc
+      end
+      
     end)
   end
 
