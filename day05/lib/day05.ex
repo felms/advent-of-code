@@ -15,9 +15,14 @@ defmodule Day05 do
       Map.put(acc, String.to_integer(label), [])
     end)
 
+    # Separo o estado inicial da lista dos movimentos
     [crates, moves] = String.split(input, number_of_crates, trim: true)
+
+    # Pego a lista dos movimentos
     moves_list = String.split(moves, "\n", trim: true)
 
+
+    # Faço o 'parse' do estado inicial
     parsed_crates = crates
                     |> String.split("\n", trim: true)
                     |> Enum.map(fn line ->
@@ -26,21 +31,14 @@ defmodule Day05 do
                       |> Enum.map(fn chunk -> Enum.join(chunk) end)
                     end)
                     |> Enum.reverse
-                    |> tl
+                    |> tl 
+                    |> Enum.reduce(map_of_crates, fn item, acc -> 
+                      fill_lists(acc, item) 
 
-    # {map_of_crates, parsed_crates, crate_labels, moves_list}
-
-    # [list | _ ] = parsed_crates
-    # fill_lists(map_of_crates, list)
-
-    map_of_lists = parsed_crates
-    |> Enum.reduce(map_of_crates, fn item, acc -> 
-      fill_lists(acc, item) 
-
-    end)
+                    end)
 
 
-    {map_of_lists, moves_list}
+    {parsed_crates, moves_list}
 
   end
 
@@ -57,7 +55,7 @@ defmodule Day05 do
           Map.put(acc, index + 1, list)
         true -> acc
       end
-      
+
     end)
   end
 
