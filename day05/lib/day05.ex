@@ -3,7 +3,8 @@ defmodule Day05 do
   Dia 05 do Advent of Code 2022
   """
 
-  def read_file do
+  # ======= Problema 01 - Mover as caixas e encontrar o estado final
+  def organize_stacks do
 
     input = File.read!("./input.txt")
 
@@ -17,10 +18,6 @@ defmodule Day05 do
 
     # Separo o estado inicial da lista dos movimentos
     [crates, moves] = String.split(input, number_of_crates, trim: true)
-
-    # Pego a lista dos movimentos
-    moves_list = String.split(moves, "\n", trim: true)
-
 
     # Faço o 'parse' do estado inicial
     parsed_crates = crates
@@ -38,11 +35,33 @@ defmodule Day05 do
                     end)
 
 
-    {parsed_crates, moves_list}
+    # {parsed_crates, moves_list}
+
+    # Pego a lista dos movimentos
+    moves_list = String.split(moves, "\n", trim: true)
+
+    # Aplico o(s) movimento
+    resulting_state = Enum.reduce(moves_list, parsed_crates, fn moveString, acc -> 
+
+      [[quantity], [from], [to]] = Regex.scan(~r/\d+/, moveString)
+      parsed_move = [String.to_integer(quantity), String.to_integer(from), String.to_integer(to)]
+      apply_move(acc, parsed_move)
+    end)
+
+    # Pego o resultado e exibo
+    resulting_state
+    |> Enum.map(fn {_key, value} -> 
+      [head | _] = value
+      head |> String.trim |> String.replace(~r/\[|\]/, "")
+    end)
+    |> Enum.join("")
 
   end
 
+  # ======= Utilitários
 
+  # - Preenche as listas do mapa com os dados de uma 
+  # das listas de entrada
   defp fill_lists(map_of_lists, list) do
 
     list
@@ -57,6 +76,22 @@ defmodule Day05 do
       end
 
     end)
+  end
+
+  # - Aplica um movimento as listas
+  defp apply_move(map_of_lists, move) do
+
+    [quantity, from, to] = move
+
+    cond do
+      quantity === 0 -> map_of_lists
+      true ->
+        [from_head | from_tail] = Map.get(map_of_lists, from)
+        to_list = [from_head | Map.get(map_of_lists, to)]
+        new_map = Map.put(map_of_lists, from, from_tail) |> Map.put(to, to_list)
+        apply_move(new_map, [quantity - 1, from, to])
+    end
+
   end
 
 end
