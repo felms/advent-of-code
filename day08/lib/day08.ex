@@ -2,11 +2,24 @@ defmodule Day08 do
   @moduledoc """
   Dia 08 do Advent of Code 2022
   """
-  def p01 do
-    input = parse_input()
-    size = Map.keys(input) |> length()
 
-    is_visible?(input, size, {2, 3})
+  # ======= Problema 01 - Quantas árvores são visiveis
+  # de fora do grid
+  def visible_trees do
+
+    input = parse_input()
+    size = Map.keys(input) |> length() |> Kernel.-(1)
+
+    #is_visible?(input, size, {2, 3})
+
+    posittions = for n <- 0..size, do:
+                    for m <- 0..size, do: {n, m}
+
+    posittions
+    |> List.flatten()
+    |> Enum.filter(fn pos -> is_visible?(input, size + 1, pos) end)
+    |> length()
+
   end
 
   def parse_input do
@@ -41,10 +54,9 @@ defmodule Day08 do
   def is_visible?(_, size, {x, y}) when x === size - 1 or y === size - 1, do: true
 
   # - Testa os outros casos
-  def is_visible?(grid, size, {x, y}) do
+  def is_visible?(grid, _size, {x, y}) do
 
     value = Map.get(grid, x) |> Map.get(y)
-    IO.inspect(value)
 
     # Mesma linha
     row = Map.get(grid, x)
@@ -59,8 +71,25 @@ defmodule Day08 do
     |> Enum.filter(fn {k, _} -> k > y end)
     |> Enum.all?(fn {_, v} -> v < value end)
 
+    # Mesma coluna
+    column = Map.to_list(grid)
+    |> List.keysort(0)
+    |> Enum.reduce([], fn {key, map}, acc ->
+      value = Map.get(map, y)
+      [{key, value} | acc]
+    end)
+    |> List.keysort(0)
+
+    is_visible_from_up = column
+    |> Enum.filter(fn {k, _} -> k < x end)
+    |> Enum.all?(fn {_, v} -> v < value end)
+
+    is_visible_from_down = column
+    |> Enum.filter(fn {k, _} -> k > x end)
+    |> Enum.all?(fn {_, v} -> v < value end)
 
     is_visible_from_left or is_visible_from_right
+    or is_visible_from_up or is_visible_from_down
 
   end
 
