@@ -7,22 +7,47 @@ defmodule Day08 do
   # de fora do grid
   def visible_trees do
 
-    input = parse_input()
-    size = Map.keys(input) |> length() |> Kernel.-(1)
+    grid = parse_input()
+    size = Map.keys(grid) |> length() |> Kernel.-(1)
 
-    #is_visible?(input, size, {2, 3})
 
     posittions = for n <- 0..size, do:
                     for m <- 0..size, do: {n, m}
 
     posittions
-    |> List.flatten()
-    |> Enum.filter(fn pos -> is_visible?(input, size + 1, pos) end)
-    |> length()
+    |> List.flatten
+    |> Enum.filter(fn pos -> is_visible?(grid, size + 1, pos) end)
+    |> length
 
   end
 
-  def parse_input do
+  # ======= Problema 02 - Maior pontuação cênica das
+  # árvores do grid
+  def highest_scenic_score do
+
+    grid = parse_input()
+    size = Map.keys(grid) |> length() |> Kernel.-(1)
+
+
+    posittions = for n <- 0..size, do:
+                    for m <- 0..size, do: {n, m}
+
+    posittions
+    |> List.flatten
+    |> Enum.reduce([], fn pos, acc -> 
+      [ scenic_score(grid, pos) | acc]
+    end)
+    |> Enum.sort_by(fn item -> item["score"] end, :desc)
+    |> hd
+
+
+  end
+
+  # ======= Utilitários
+  
+  # - Lê o aquivo de entrada e monta a 
+  # estrutura de dados que será trabalhada
+  defp parse_input do
 
     {_ , map} = File.read!("./input.txt")
     |> String.split("\n", trim: true)
@@ -49,12 +74,13 @@ defmodule Day08 do
     end)
   end
 
+  # - Testa se uma árvore é visivel de fora do grid
   # - Se está em uma das bordas é visivel
-  def is_visible?(_, _, {x, y}) when x === 0 or y === 0, do: true
-  def is_visible?(_, size, {x, y}) when x === size - 1 or y === size - 1, do: true
+  defp is_visible?(_, _, {x, y}) when x === 0 or y === 0, do: true
+  defp is_visible?(_, size, {x, y}) when x === size - 1 or y === size - 1, do: true
 
   # - Testa os outros casos
-  def is_visible?(grid, _size, {x, y}) do
+  defp is_visible?(grid, _size, {x, y}) do
 
     value = Map.get(grid, x) |> Map.get(y)
 
@@ -90,6 +116,77 @@ defmodule Day08 do
 
     is_visible_from_left or is_visible_from_right
     or is_visible_from_up or is_visible_from_down
+
+  end
+
+  # - Calcula a "pontuação cênica" 
+  # de uma árvore
+  defp scenic_score(grid, {x, y}) do
+
+    value = Map.get(grid, x) |> Map.get(y)
+
+    # Mesma linha
+    row = Map.get(grid, x)
+    |> Map.to_list()
+    |> List.keysort(0)
+
+    looking_left = row
+    |> Enum.filter(fn {k, _} -> k < y end)
+    |> Enum.reverse
+    |> Enum.reduce_while(0, fn {_, v}, acc -> 
+      if v < value do
+        {:cont, acc + 1}
+      else
+        {:halt, acc + 1}
+      end
+    end)
+
+    looking_right = row
+    |> Enum.filter(fn {k, _} -> k > y end)
+    |> Enum.reduce_while(0, fn {_, v}, acc -> 
+      if v < value do
+        {:cont, acc + 1}
+      else
+        {:halt, acc + 1}
+      end
+    end)
+
+    # Mesma coluna
+    column = Map.to_list(grid)
+    |> List.keysort(0)
+    |> Enum.reduce([], fn {key, map}, acc ->
+      value = Map.get(map, y)
+      [{key, value} | acc]
+    end)
+    |> List.keysort(0)
+
+    looking_up = column
+    |> Enum.filter(fn {k, _} -> k < x end)
+    |> Enum.reverse
+    |> Enum.reduce_while(0, fn {_, v}, acc -> 
+      if v < value do
+        {:cont, acc + 1}
+      else
+        {:halt, acc + 1}
+      end
+    end)
+
+    looking_down = column
+    |> Enum.filter(fn {k, _} -> k > x end)
+    |> Enum.reduce_while(0, fn {_, v}, acc -> 
+      if v < value do
+        {:cont, acc + 1}
+      else
+        {:halt, acc + 1}
+      end
+    end)
+
+    score = looking_left * looking_up * looking_right * looking_down
+
+    # Estrutura retornada
+    %{"pos" => {x, y},
+      "value" => value, 
+      "score" => score}
 
   end
 
