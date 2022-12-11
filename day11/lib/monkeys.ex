@@ -15,7 +15,7 @@ defmodule Monkeys do
     monkey_test = %{:div_by => div_by, :if_true => if_true, :if_false => if_false}
     inspected_items = 0
 
-    {monkey_id, 
+    {monkey_id,
       %{:starting_items => starting_items,
         :operation => operation,
         :monkey_test => monkey_test,
@@ -24,9 +24,12 @@ defmodule Monkeys do
 
   end
 
-  # - Executa a rodada para o macaco e retorna o macaco atualizado 
+  # - Executa a rodada para o macaco e retorna o macaco atualizado
   # e duas listas com os itens a serem repassados a outros macacos
-  def execute_round(monkey) do
+  def execute_round(monkeys, monkey_id) do
+
+    monkey = Map.get(monkeys, monkey_id)
+
     inspected_items = monkey.inspected_items
     div_by = monkey.monkey_test.div_by
     if_true_monkey = monkey.monkey_test.if_true;
@@ -35,17 +38,17 @@ defmodule Monkeys do
     starting_items = monkey.starting_items
 
 
-    {inspected, to_update} = 
-      starting_items 
-      |> Enum.reduce({inspected_items, %{if_true_monkey => [], if_false_monkey => []}}, 
-        fn item, acc -> 
+    {inspected, to_update} =
+      starting_items
+      |> Enum.reduce({inspected_items, %{if_true_monkey => [], if_false_monkey => []}},
+        fn item, acc ->
 
           {insp, map} = acc
           new_value = apply_operation(operation, item) |> Integer.floor_div(3)
           new_inspected = insp + 1
 
           cond do
-            rem(new_value, div_by) === 0 -> 
+            rem(new_value, div_by) === 0 ->
               new_if_true_list = Map.get(map, if_true_monkey) |> List.insert_at(-1, new_value)
               new_map = Map.put(map, if_true_monkey, new_if_true_list)
               {new_inspected, new_map}
@@ -57,19 +60,34 @@ defmodule Monkeys do
 
         end)
 
-    new_monkey = %{:inspected_items => inspected, 
+    new_monkey = %{:inspected_items => inspected,
       :monkey_test => monkey.monkey_test,
       :operation => monkey.operation,
       :starting_items => []}
 
-    {to_update, new_monkey}
+
+    old_if_true_monkey = Map.get(monkeys, if_true_monkey)
+    old_if_false_monkey = Map.get(monkeys, if_false_monkey)
+
+    if_true_monkey_items = old_if_true_monkey.starting_items
+    if_false_monkey_items = old_if_false_monkey.starting_items
+
+    new_itm_items = if_true_monkey_items ++ Map.get(to_update, if_true_monkey)
+    new_if_true_monkey = Map.put(old_if_true_monkey, :starting_items, new_itm_items)
+
+    new_ifm_items = if_false_monkey_items ++ Map.get(to_update, if_false_monkey)
+    new_if_false_monkey = Map.put(old_if_false_monkey, :starting_items, new_ifm_items)
+
+    Map.put(monkeys, monkey_id, new_monkey)
+    |> Map.put(if_true_monkey, new_if_true_monkey)
+    |> Map.put(if_false_monkey, new_if_false_monkey)
 
   end
 
   # - Aplica a operação sobre o item
   def apply_operation(operation, item) do
 
-    [operand0, operation, operand1] = Enum.map(operation, fn value -> 
+    [operand0, operation, operand1] = Enum.map(operation, fn value ->
       cond do
         value === "old" -> item
         String.match?(value, ~r/\d+/) -> String.to_integer(value)
