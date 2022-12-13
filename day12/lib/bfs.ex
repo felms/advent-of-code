@@ -4,7 +4,7 @@ defmodule BFS do
 
     explored = [start_position]
 
-    {paths, _} = recursive_find_path(start_position, end_position, explored, 0, [], graph)
+    paths = recursive_find_path(start_position, end_position, explored, 0, [], graph)
 
     paths
 
@@ -16,25 +16,21 @@ defmodule BFS do
   def recursive_find_path(start_position, end_position, explored, current_path, paths, graph) do
 
     if start_position === end_position do
-      {[current_path | paths], explored}
+      [current_path | paths]
     else
 
+      new_explored = [start_position | explored]
       neighbors = find_neighbors(start_position, graph)
-      |> Enum.filter(fn neighbor -> not Enum.member?(explored, neighbor) end)
+      |> Enum.filter(fn neighbor -> not Enum.member?(new_explored, neighbor) end)
 
       cond do
-        Enum.empty?(neighbors) -> {paths, explored}
+        Enum.empty?(neighbors) -> paths
         true ->
-          Enum.reduce(neighbors, {paths, explored}, fn neighbor, acc ->
-            {p, e} = acc
-            new_explored = [neighbor | e]
+          Enum.reduce(neighbors, paths, fn neighbor, acc ->
 
-            {new_paths, _} = recursive_find_path(neighbor, end_position, new_explored, current_path + 1, p, graph)
-            {new_paths, e}
+            recursive_find_path(neighbor, end_position, new_explored, current_path + 1, acc, graph)
           end)
-
       end
-
     end
   end
 

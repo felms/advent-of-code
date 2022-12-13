@@ -9,7 +9,7 @@ defmodule Day12 do
 
     {start, goal, heightmap} = parse_input(input_file)
 
-    path = BFS.find_path(start_position, end_position, heightmap)
+    path = BFS.find_path(start, goal, heightmap)
 
     path
 
@@ -50,7 +50,7 @@ defmodule Day12 do
 
       cond do
         v === "S" -> Map.put(acc, k, 0)
-        v === "E" -> Map.put(acc, k, 26)
+        v === "E" -> Map.put(acc, k, 25)
         true ->
           value = Map.get(letter_values, v)
           Map.put(acc, k, value)
