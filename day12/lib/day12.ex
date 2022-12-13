@@ -7,7 +7,7 @@ defmodule Day12 do
   # ======= Problema 01 - Nivel de 'monkey business'
   def part_01(input_file) do
 
-    {start_position, end_position, heightmap} = parse_input(input_file)
+    {start, goal, heightmap} = parse_input(input_file)
 
     path = BFS.find_path(start_position, end_position, heightmap)
 
