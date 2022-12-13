@@ -9,9 +9,9 @@ defmodule Day12 do
 
     {start, goal, heightmap} = parse_input(input_file)
 
-    paths = Graph.findAllPaths(start, goal, heightmap)
+    path = BFS.find_path(start_position, end_position, heightmap)
 
-    paths |> Enum.min
+    path
 
   end
 
