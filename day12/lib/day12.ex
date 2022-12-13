@@ -5,13 +5,21 @@ defmodule Day12 do
 
 
   # ======= Problema 01 - Nivel de 'monkey business'
-  def part_01 do
-    :world
+  def part_01(input_file) do
+
+    {start_position, end_position, heightmap} = parse_input(input_file)
+
+    visited = []
+
+    {path, _} = BFS.find_path(start_position, end_position, heightmap, visited)
+
+    path
+
   end
 
   # ======= Utilitários 
   # - Faz o parse do input e gera a estrutura de dados inicial
-  def parse_input(input_file) do
+  defp parse_input(input_file) do
 
     input = File.read!(input_file)
     |> String.split("\n", trim: true)
@@ -43,7 +51,7 @@ defmodule Day12 do
 
       cond do
         v === "S" -> Map.put(acc, k, 0)
-        v === "E" -> Map.put(acc, k, 25)
+        v === "E" -> Map.put(acc, k, 26)
         true -> 
           value = Map.get(letter_values, v)
           Map.put(acc, k, value)
