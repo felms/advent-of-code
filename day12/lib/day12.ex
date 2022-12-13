@@ -9,19 +9,18 @@ defmodule Day12 do
 
     {start_position, end_position, heightmap} = parse_input(input_file)
 
-    visited = []
-
-    {path, _} = BFS.find_path(start_position, end_position, heightmap, visited)
+    path = BFS.find_path(start_position, end_position, heightmap)
 
     path
 
   end
 
-  # ======= Utilitários 
+  # ======= Utilitários
   # - Faz o parse do input e gera a estrutura de dados inicial
   defp parse_input(input_file) do
 
     input = File.read!(input_file)
+    |> String.replace("\r", "")
     |> String.split("\n", trim: true)
     |> Enum.map(fn line -> String.graphemes(line) end)
 
@@ -43,16 +42,16 @@ defmodule Day12 do
 
 
     letter_values = "abcdefghijklmnopqrstuvwxyz"
-                    |> String.graphemes 
+                    |> String.graphemes
                     |> Enum.zip(0..25)
                     |> Enum.into(%{})
 
-    heightmap = Enum.reduce(index_item, %{}, fn {k, v}, acc -> 
+    heightmap = Enum.reduce(index_item, %{}, fn {k, v}, acc ->
 
       cond do
         v === "S" -> Map.put(acc, k, 0)
         v === "E" -> Map.put(acc, k, 26)
-        true -> 
+        true ->
           value = Map.get(letter_values, v)
           Map.put(acc, k, value)
       end
