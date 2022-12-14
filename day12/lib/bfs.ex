@@ -1,5 +1,7 @@
 defmodule BFS do
 
+  # - Faz o setup inicial das variáveis e chama o
+  # metodo recursivo que executa o algoritmo
   def bfs(start_position, end_position, graph) do
 
     queue = [{start_position, 0}]
@@ -9,6 +11,7 @@ defmodule BFS do
 
   end
 
+  # - Método recursivo que executa o BFS
   defp find_path( _, _, [], _), do: %{:dist => -1}
 
 

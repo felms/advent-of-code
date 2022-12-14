@@ -3,7 +3,7 @@ defmodule Day12 do
   Dia 12 do Advent of Code 2022
   """
 
-  # ======= Problema 01 - Nivel de 'monkey business'
+  # ======= Problema 01 - Menor percurso partindo do ponto S
   def part_01(input_file) do
 
     {start, goal, heightmap} = parse_input(input_file)
