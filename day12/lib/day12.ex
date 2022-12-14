@@ -3,13 +3,12 @@ defmodule Day12 do
   Dia 12 do Advent of Code 2022
   """
 
-
   # ======= Problema 01 - Nivel de 'monkey business'
   def part_01(input_file) do
 
     {start, goal, heightmap} = parse_input(input_file)
 
-    path = BFS.find_path(start, goal, heightmap)
+    path = BFS.bfs(start, goal, heightmap)
 
     path
 
@@ -43,7 +42,7 @@ defmodule Day12 do
 
     letter_values = "abcdefghijklmnopqrstuvwxyz"
                     |> String.graphemes
-                    |> Enum.zip(0..25)
+                    |> Enum.with_index
                     |> Enum.into(%{})
 
     heightmap = Enum.reduce(index_item, %{}, fn {k, v}, acc ->

@@ -1,41 +1,44 @@
 defmodule BFS do
 
-  def find_path(start_position, end_position, graph) do
+  def bfs(start_position, end_position, graph) do
 
-    explored = [start_position]
-
-    paths = recursive_find_path(start_position, end_position, explored, 0, [], graph)
-
-    paths
+    find_path(end_position, graph, [start_position], 0, [], [start_position])
 
   end
 
-  def recursive_find_path(_, _, explored, _, paths, graph)
-                            when explored |> length === graph |> length,  do: {paths, explored}
+  defp find_path( _, _, [], _, paths, _), do: paths 
 
-  def recursive_find_path(start_position, end_position, explored, current_path, paths, graph) do
+  defp find_path(end_position, graph, queue, current_path, paths, explored) do 
 
-    if start_position === end_position do
+    {v, new_queue} = List.pop_at(queue, 0)
+
+    if v === end_position do
       [current_path | paths]
     else
 
-      new_explored = [start_position | explored]
-      neighbors = find_neighbors(start_position, graph)
-      |> Enum.filter(fn neighbor -> not Enum.member?(new_explored, neighbor) end)
+      neighbors = find_neighbors(v, graph)
 
-      cond do
-        Enum.empty?(neighbors) -> paths
-        true ->
-          Enum.reduce(neighbors, paths, fn neighbor, acc ->
+      {updated_queue, updated_explored} = Enum.reduce(neighbors, {new_queue, explored}, fn neighbor, acc -> 
+        {i_queue, i_explored} = acc
 
-            recursive_find_path(neighbor, end_position, new_explored, current_path + 1, acc, graph)
-          end)
-      end
+        cond do 
+          Enum.member?(i_explored, neighbor) -> acc
+          true -> 
+            acc_explored = [neighbor | i_explored]
+            acc_queue = List.insert_at(i_queue, -1, neighbor)
+            {acc_queue, acc_explored}
+        end
+
+      end)
+
+      find_path(end_position, graph, updated_queue, current_path + 1, paths, updated_explored)
+
     end
-  end
 
-   # - Encontra os todos os vizinhos permitidos de um ponto
-   def find_neighbors(point, matrix) do
+  end 
+
+  # - Encontra os todos os vizinhos permitidos de um ponto
+  defp find_neighbors(point, matrix) do
 
     max_x = Enum.map(matrix, fn {{x, _}, _} -> x end) |> Enum.max
     max_y = Enum.map(matrix, fn {{_, y}, _} -> y end) |> Enum.max
@@ -46,25 +49,18 @@ defmodule BFS do
 
       neighbor_value = Map.get(matrix, neighbor)
 
-      point_value - neighbor_value >= -1
+      neighbor_value - point_value <= 1
 
     end)
 
   end
 
-  # - Encontra todos os vizinhos nas 4 pontas
-  def find_all_neighbors({x, y}, _, _) when x === 0 and y === 0, do: [{0, 1}, {1, 0}]
-  def find_all_neighbors({x, y}, max_x, max_y) when x === max_x and y === max_y, do: [{max_x, max_y - 1}, {max_x - 1, max_y}]
-  def find_all_neighbors({x, y}, max_x, _) when x === max_x and y === 0, do: [{max_x, 1}, {max_x - 1, 0}]
-  def find_all_neighbors({x, y}, _, max_y) when x === 0 and y === max_y, do: [{0, max_y - 1}, {1, max_y}]
-
-  # - Encontra todos os vizinhos nas linhas e colunas das bordas
-  def find_all_neighbors({x, y}, _, _) when x === 0, do: [{x, y - 1}, {x, y + 1}, {x + 1, y}]
-  def find_all_neighbors({x, y}, _, _) when y === 0, do: [{x - 1, y}, {x + 1, y}, {x, y + 1}]
-  def find_all_neighbors({x, y}, max_x, _) when x === max_x, do: [{x, y - 1}, {x, y + 1}, {x - 1, y}]
-  def find_all_neighbors({x, y}, _, max_y) when y === max_y, do: [{x - 1, y}, {x + 1, y}, {x, y - 1}]
-
-  # - Encontra todos os vizinhos no centro da matriz
-  def find_all_neighbors({x, y}, _, _), do: [{x, y + 1}, {x, y - 1}, {x - 1, y}, {x + 1, y}]
+  # - Encontra todos os vizinhos de um ponto
+  defp find_all_neighbors({x, y}, max_x, max_y) do 
+    [{x, y + 1}, {x, y - 1}, {x - 1, y}, {x + 1, y}] 
+    |> Enum.filter(fn {px, py} -> 
+      px >= 0 and py >= 0 and px <= max_x and py <= max_y
+    end)
+  end
 
 end
