@@ -2,40 +2,39 @@ defmodule BFS do
 
   def bfs(start_position, end_position, graph) do
 
-    find_path(end_position, graph, [start_position], 0, [], [start_position])
+    queue = [{start_position, 0}]
+    visited = [start_position]
+
+    find_path(end_position, graph, queue, visited)
 
   end
 
-  defp find_path( _, _, [], _, paths, _), do: paths 
+  defp find_path( _, _, [], _), do: %{:dist => -1}
 
-  defp find_path(end_position, graph, queue, current_path, paths, explored) do 
 
-    {v, new_queue} = List.pop_at(queue, 0)
+  defp find_path(end_position, graph, queue, visited) do
 
-    if v === end_position do
-      [current_path | paths]
+    {{node, dist}, new_queue} = List.pop_at(queue, 0)
+
+    if node === end_position do
+      %{:dist => dist}
     else
+      neighbors = find_neighbors(node, graph)
 
-      neighbors = find_neighbors(v, graph)
-
-      {updated_queue, updated_explored} = Enum.reduce(neighbors, {new_queue, explored}, fn neighbor, acc -> 
-        {i_queue, i_explored} = acc
-
-        cond do 
-          Enum.member?(i_explored, neighbor) -> acc
-          true -> 
-            acc_explored = [neighbor | i_explored]
-            acc_queue = List.insert_at(i_queue, -1, neighbor)
-            {acc_queue, acc_explored}
+      {res_queue, res_visited} = Enum.reduce(neighbors, {new_queue, visited}, fn neighbor, acc ->
+        {i_queue, i_visited} = acc
+        cond do
+          not Enum.member?(i_visited, neighbor) ->
+            acc_queue = List.insert_at(i_queue, -1, {neighbor, dist + 1})
+            acc_visited = [neighbor | i_visited]
+            {acc_queue, acc_visited}
+          true -> acc
         end
-
       end)
-
-      find_path(end_position, graph, updated_queue, current_path + 1, paths, updated_explored)
-
+      find_path(end_position, graph, res_queue, res_visited)
     end
 
-  end 
+  end
 
   # - Encontra os todos os vizinhos permitidos de um ponto
   defp find_neighbors(point, matrix) do
@@ -56,9 +55,9 @@ defmodule BFS do
   end
 
   # - Encontra todos os vizinhos de um ponto
-  defp find_all_neighbors({x, y}, max_x, max_y) do 
-    [{x, y + 1}, {x, y - 1}, {x - 1, y}, {x + 1, y}] 
-    |> Enum.filter(fn {px, py} -> 
+  defp find_all_neighbors({x, y}, max_x, max_y) do
+    [{x, y + 1}, {x, y - 1}, {x - 1, y}, {x + 1, y}]
+    |> Enum.filter(fn {px, py} ->
       px >= 0 and py >= 0 and px <= max_x and py <= max_y
     end)
   end
