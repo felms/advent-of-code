@@ -3,12 +3,24 @@ defmodule Day12 do
   Dia 12 do Advent of Code 2022
   """
 
-  # ======= Problema 01 - Menor percurso partindo do ponto S
+  # ======= Problema 01 - Menor percurso partindo do ponto 'S'
   def part_01(input_file) do
 
     {start, goal, heightmap} = parse_input(input_file)
 
     path = BFS.bfs(start, goal, heightmap)
+
+    path
+
+  end
+
+  # ======= Problema 02 - Menor percurso partindo de
+  # qualquer um dos pontos 'a'
+  def part_02(input_file) do
+
+    {start, goal, heightmap} = parse_input(input_file)
+
+    path = BFS02.bfs(start, goal, heightmap)
 
     path
 
