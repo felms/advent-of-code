@@ -18,6 +18,28 @@ defmodule Day13 do
     end)
   end
 
+  # ======= Problema 02 - Produto dos indices dos 'divider packets'
+  # depois de ordenar toda a lista (incluindo eles)
+  def part_02(input) do
+
+    divider_packet0 = [[2]]
+    divider_packet1 = [[6]]
+
+    parse_input(input)
+    |> Enum.flat_map(fn {x, y} -> [x, y] end)
+    |> Kernel.++([divider_packet0, divider_packet1])
+    |> Enum.sort(&sorter/2)
+    |> Enum.with_index(1)
+    |> Enum.reduce(1, fn {packet, index}, acc ->
+      cond do
+        packet === divider_packet0 -> index * acc
+        packet === divider_packet1 -> index * acc
+        true -> acc
+      end
+    end)
+
+  end
+
   # - Parse do input
   defp parse_input(input) do
 
