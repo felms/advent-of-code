@@ -147,12 +147,6 @@ Afterward, locate the divider packets. To find the decoder key for this distress
 
 Organize all of the packets into the correct order. What is the decoder key for the distress signal?
 
-Your puzzle answer was 21756.
 
-Both parts of this puzzle are complete! They provide two gold stars: **
 
-At this point, you should return to your Advent calendar and try another puzzle.
 
-If you still want to see it, you can get your puzzle input.
-
-You can also [Shareon Twitter Mastodon] this puzzle.
