@@ -1,6 +1,6 @@
 defmodule Day13 do
   @moduledoc """
-  Dia 13 do Advento of Code 2022
+  Dia 13 do Advent of Code 2022
   """
 
   # ======= Problema 01 - Soma dos indices dos pares de listas ordenadas
