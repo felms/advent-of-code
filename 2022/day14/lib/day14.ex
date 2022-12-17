@@ -8,12 +8,12 @@ defmodule Day14 do
   def part_01(input_file) do
     grid = parse_input(input_file)
 
-    # - Valor máximo de y. Se algum grão chegar 
+    # Valor máximo de y. Se algum grão chegar 
     # a esse ponto, sabemos que ele foi para o 'endless void'
     max_y = Enum.map(grid, fn {{_x, y}, _v} -> y end)
             |> Enum.max
 
-    # - Loop que derruba grãos até que um caia fora do grid
+    # Loop que derruba grãos até que um caia fora do grid
     {grains, _} = Enum.reduce_while(0..(max_y * max_y), {0, grid}, fn _, acc -> 
       {number_of_grains, current_grid} = acc
 
@@ -28,6 +28,47 @@ defmodule Day14 do
     end)
 
     grains
+
+  end
+
+  # ======= Problema 02 - Número de grãos até
+  # que não tenha como cair mais grãos
+  def part_02(input_file) do
+
+    grid = parse_input(input_file)
+
+    # Valor máximo de y 
+    max_y = Enum.map(grid, fn {{_x, y}, _v} -> y end)
+            |> Enum.max
+    
+    # Valor mínimo em máximo de x 
+      {min_x, max_x} = Enum.reduce(grid, {100000, 0}, fn {{x, _y}, _v}, acc -> 
+      {curr_min, curr_max} = acc
+      {min(curr_min, x), max(curr_max, x)}
+    end)
+
+    # Gera o chão da caverna
+    floor_points = for x <- (min_x)..(max_x), do: {x, max_y}
+
+    # Atualiza o grid para inserir o chão da caverna
+    part02_grid = Enum.reduce(floor_points, grid, fn point, acc -> Map.put(acc, point, "#") end)
+    
+
+    # Loop que derruba grãos até que não seja mais possível cair nenhum
+    {grains, _} = Enum.reduce_while(0..(max_y * max_y), {0, part02_grid}, fn _, acc -> 
+      {number_of_grains, current_grid} = acc
+
+      {new_grid, {_, curr_y}} = Cave.drop_sand(current_grid)
+      
+      if curr_y === 0 do
+        {:halt, {number_of_grains, new_grid}}
+      else
+        {:cont, {number_of_grains + 1, new_grid}}
+      end
+      
+    end)
+
+    grains + 1 # o '+ 1' é pq o último grão não é contado no reduce
 
   end
 
@@ -52,8 +93,8 @@ defmodule Day14 do
       end)
 
     # Gera todos os pontos possíveis
-    all_points = for x <- (min_x - 5)..(max_x + 5),
-      y <- 0..(max_y + 5), do: {x, y}
+    all_points = for x <- (min_x - 1000)..(max_x + 1000),
+      y <- 0..(max_y + 2), do: {x, y}
 
     # Cria o grid com os pontos
     grid = Enum.reduce(all_points, %{}, fn point, acc -> 
