@@ -3,6 +3,16 @@ defmodule Day14 do
   Dia 14 do Advent of Code 2022
   """
 
+  def part_01(input_file) do
+    grid = parse_input(input_file)
+
+    Enum.reduce(1..26, grid, fn _, acc -> 
+      Cave.drop_sand(acc)
+    end)
+    |> Enum.filter(fn {_k, v} -> v === "o" end)
+
+  end
+
   # - Faz o parse do input e gera as estruturas iniciais
   def parse_input(input_file) do
 
