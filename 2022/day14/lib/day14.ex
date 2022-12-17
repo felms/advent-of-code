@@ -3,14 +3,39 @@ defmodule Day14 do
   Dia 14 do Advent of Code 2022
   """
 
+  # - Faz o parse do input e gera as estruturas iniciais
   def parse_input(input_file) do
-    File.read!(input_file)
-    |> String.replace("\r", "") # Para evitar problemas no Windows
-    |> String.split("\n", trim: true)
-    |> Enum.map(&parse_line/1)
-    |> Enum.reduce(MapSet.new(), fn points, acc -> 
-      parse_points(points, acc)
+
+    # Gera as estruturas iniciais
+    structures = File.read!(input_file)
+                 |> String.replace("\r", "") # Para evitar problemas no Windows
+                 |> String.split("\n", trim: true)
+                 |> Enum.map(&parse_line/1)
+                 |> Enum.reduce(MapSet.new(), fn points, acc -> 
+                   parse_points(points, acc)
+                 end)
+
+    # Descobre os valores minimos e máximos de x e y
+    {min_x, _min_y, max_x, max_y} = 
+      MapSet.to_list(structures)
+      |> Enum.reduce({100000, 100000, 0, 0}, fn {x, y}, acc -> 
+        {min_ax, min_ay, max_ax, max_ay} = acc
+        {min(min_ax, x), min(min_ay, y), max(max_ax, x), max(max_ay, y)}
+      end)
+
+    # Gera todos os pontos possíveis
+    all_points = for x <- (min_x - 5)..(max_x + 5),
+      y <- 0..(max_y + 5), do: {x, y}
+
+    # Cria o grid com os pontos
+    grid = Enum.reduce(all_points, %{}, fn point, acc -> 
+      Map.put(acc, point, ".")
     end)
+
+    # Insere as estrutura no grid
+    MapSet.to_list(structures)
+    |> Enum.reduce(grid, fn point, acc -> Map.put(acc, point, "#") end)
+
   end
 
   # - Transfoma uma linha de texto em lista de pontos
@@ -51,5 +76,5 @@ defmodule Day14 do
 
     for x <- x0..x1, y <- y0..y1, do: {x, y}
   end
-  
+
 end
