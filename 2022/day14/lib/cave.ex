@@ -6,7 +6,7 @@ defmodule Cave do
 
     neighbor = get_neighbor(grain_position, grid)
     if neighbor === :none do
-      grid
+      {grid, grain_position}
     else
       updated_grid = Map.put(grid, grain_position, ".") |> Map.put(neighbor, "o")
       drop_sand(updated_grid, neighbor) 
@@ -20,7 +20,7 @@ defmodule Cave do
     neighbor = get_neighbor(grain_position, grid)
 
     if neighbor === :none do
-      grid
+      {grid, grain_position}
     else
       updated_grid = Map.put(grid, grain_position, ".") |> Map.put(neighbor, "o")
       drop_sand(updated_grid, neighbor) 

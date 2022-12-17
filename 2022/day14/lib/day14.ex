@@ -3,13 +3,31 @@ defmodule Day14 do
   Dia 14 do Advent of Code 2022
   """
 
+  # ======= Problema 01 - Número de grãos até
+  # que eles comecem a cair no 'endless void'
   def part_01(input_file) do
     grid = parse_input(input_file)
 
-    Enum.reduce(1..26, grid, fn _, acc -> 
-      Cave.drop_sand(acc)
+    # - Valor máximo de y. Se algum grão chegar 
+    # a esse ponto, sabemos que ele foi para o 'endless void'
+    max_y = Enum.map(grid, fn {{_x, y}, _v} -> y end)
+            |> Enum.max
+
+    # - Loop que derruba grãos até que um caia fora do grid
+    {grains, _} = Enum.reduce_while(0..(max_y * max_y), {0, grid}, fn _, acc -> 
+      {number_of_grains, current_grid} = acc
+
+      {new_grid, {_, curr_y}} = Cave.drop_sand(current_grid)
+      
+      if curr_y === max_y do
+        {:halt, {number_of_grains, new_grid}}
+      else
+        {:cont, {number_of_grains + 1, new_grid}}
+      end
+      
     end)
-    |> Enum.filter(fn {_k, v} -> v === "o" end)
+
+    grains
 
   end
 
