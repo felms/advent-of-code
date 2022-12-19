@@ -4,29 +4,29 @@ defmodule Day15 do
   """
 
   def run(input_file, row) do
-    IO.puts("\nParsing input...")
     input = parse_input(input_file)
 
-    IO.puts("")
-    # IO.puts("Part 01: #{part_01(input, row)}")
-    part_01(input, row)
+    {time, result} = :timer.tc(&part_01/2, [input, row])
+
+    IO.puts(
+      "==Part 01== \nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
+  # ======= Problema 01 - Contar o número de posições
+  # na linha informada onde um beacon não pode existir
   def part_01(input, row) do
-    IO.puts("Creating grid...")
-    grid = Tunnels.create_row(input, row)
+    readings = Tunnels.relevant_readings(input, row)
 
-    IO.puts("Calculating coverage...")
+    beacons = Tunnels.number_of_beacons(readings, row)
 
-    # not_covered_points =
-    #  Tunnels.calc_point_coverage(grid, input)
-    #  |> length()
+    covered_points =
+      Tunnels.calc_coverage(readings, row)
+      |> MapSet.to_list()
+      |> length()
 
-    # grid_size = grid |> length()
-
-    # grid_size - not_covered_points
-
-    Tunnels.calc_coverage(input, row)
+    covered_points - beacons
   end
 
   # - Parse do input

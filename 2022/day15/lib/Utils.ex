@@ -7,7 +7,8 @@ defmodule Utils do
     abs(x_1 - x_2) + abs(y_1 - y_2)
   end
 
-  # - Pontos no range de um sensor
+  # - Gera os pontos da 'borda' da área visivél 
+  # de um sensor
   def points_in_range({point_x, point_y}, radius) do
     left = {point_x - radius, point_y}
 
