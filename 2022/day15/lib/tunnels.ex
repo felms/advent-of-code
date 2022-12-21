@@ -1,6 +1,6 @@
 defmodule Tunnels do
-  # - Filtra as leituras do input para 
-  # deixar apenas as que possuem sensores que possam cobrir a linha 
+  # - Filtra as leituras do input para
+  # deixar apenas as que possuem sensores que possam cobrir a linha
   # fornecida
   def relevant_readings(readings, row) do
     Enum.filter(readings, fn reading ->
@@ -41,6 +41,30 @@ defmodule Tunnels do
         MapSet.union(acc, MapSet.new(range))
       else
         MapSet.union(acc, MapSet.new(points))
+      end
+    end)
+  end
+
+  # - Gera os pontos fora da borda da área
+  # coberta por um sensor, filtrando para
+  # valor máximo permitido de linhas e colunas
+  def get_points_outside_border(reading, max_row_value) do
+    Utils.points_in_range(reading.sensor, reading.distance + 1)
+    |> Enum.filter(fn {x, y} ->
+      x >= 0 and x <= max_row_value and
+        y >= 0 and y <= max_row_value
+    end)
+  end
+
+  # - Testa se o ponto está coberto por algum sensor
+  def uncovered_point?(point, readings) do
+    Enum.reduce_while(readings, true, fn reading, _acc ->
+      dist = Utils.manhattan_distance(point, reading.sensor)
+
+      if dist <= reading.distance do
+        {:halt, false}
+      else
+        {:cont, true}
       end
     end)
   end
