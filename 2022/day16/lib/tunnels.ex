@@ -1,30 +1,27 @@
 defmodule Tunnels do
 
-  def dfs(graph, source) do
-    s = [{source, 0}]
-    find_path(graph, s, [], 0, [], 30)
+  # - Roda o DFS para cada uma das válvulas
+  # para calcular a distância entre todas
+  # tomando cada uma como ponto de partida
+  def calc_distances(graph) do
+    Enum.reduce(graph, %{}, fn {key, _}, acc ->
+      Map.put(acc, key, dfs(graph, key, [], %{}, 0))
+    end)
   end
 
-  def find_path(_, _, _, current_flow, flows, 0), do: {current_flow, flows}
-  def find_path(_, [], _, current_flow, flows, _), do: {current_flow, flows}
-  def find_path(graph, s, discovered, current_flow, flows, minutes) do
-    {{v, v_flow}, new_queue} = List.pop_at(s, 0)
-    neighbors = get_neighbors(v, graph)
-    |> Enum.reject(fn {item, _} -> Enum.member?(discovered, item) end)
-    |> Enum.sort(fn {_, flow0},{_, flow1} -> flow0 >= flow1 end)
+  # - Usa o algoritmo DFS para calcular as distancias
+  # de um vértice (válvula) para todos os outros no
+  # no grafo (conjunto de tuneis)
+  def dfs(graph, source, discovered, res, dist) do
+    current_discovered = [source | discovered]
+    current_res = Map.put(res, source, dist)
+    neighbors = graph[source][:tunnels]
+    |> Enum.reject(fn item -> Enum.member?(current_discovered, item) end)
+    |> Enum.reject(fn item -> Map.has_key?(current_res, item) end)
 
-    IO.inspect(v)
-    IO.inspect(neighbors)
-
-    new_discovered = [v | discovered]
-    new_s = neighbors ++ new_queue
-
-    if v_flow > 0 do
-      new_flow = current_flow + v_flow
-      find_path(graph, new_s, new_discovered, new_flow, [new_flow | flows], minutes - 2)
-    else
-      find_path(graph, new_s, new_discovered, current_flow, [current_flow | flows], minutes - 1)
-    end
+    Enum.reduce(neighbors, current_res, fn neighbor, acc ->
+      dfs(graph, neighbor, current_discovered, acc, dist + 1)
+    end)
 
   end
 
