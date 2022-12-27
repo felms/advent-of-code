@@ -3,7 +3,7 @@ defmodule Day16 do
   Dia 16 do Advento of Code de 2022
   """
 
-  # - Fas o parse do input e gera uma tabela com
+  # - Faz o parse do input e gera uma tabela com
   # com o nome, taxa de fluxo e vizinhos
   # para cada válvula
   def parse_input(input_file) do
