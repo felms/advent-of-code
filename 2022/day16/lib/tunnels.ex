@@ -2,7 +2,7 @@ defmodule Tunnels do
   def pressure_release(graph, time, valve, dists, open_valves) do
     neighbors = 
       get_neighbors(valve, dists, graph)
-    #IO.inspect(neighbors)
+
 
     Enum.reduce(neighbors, 0, fn neighbor, max_value ->
       remtime = time - dists[valve][neighbor] - 1
@@ -18,7 +18,7 @@ defmodule Tunnels do
           max(
             max_value,
             pressure_release(graph, remtime, neighbor, dists, [neighbor | open_valves]) +
-              graph[valve][:flow_rate] * remtime
+              graph[neighbor][:flow_rate] * remtime
           )
       end
     end)
@@ -53,8 +53,9 @@ defmodule Tunnels do
   # - Retorna um lista com todas as válvulas acessiveis
   # apartir da valvula indicada e cujas taxas de fluxo
   # sejam > zero
-  def get_neighbors(valve, dists, _graph) do
+  def get_neighbors(valve, dists, graph) do
     dists[valve]
     |> Enum.map(fn {k, _} -> k end)
+    |> Enum.reject(fn item -> graph[item][:flow_rate] === 0 end)
   end
 end
