@@ -43,6 +43,7 @@ defmodule Day16 do
   def parse_tunnels(tunnels_string) do
     tunnels_string
     |> String.replace(~r/.*(valve |valves )/, "")
+    |> String.replace(" ", "")
     |> String.split(",", trim: true)
   end
 end
