@@ -1,53 +1,61 @@
 defmodule Day17 do
   @moduledoc """
-  Documentation for `Day17`.
+  Dia 17 do Advent of Code 2022
   """
 
-  def part_01(input_file) do
+  def run(input_file \\ "sample_input.txt") do
+    {time, result} = :timer.tc(&part_01/1, [input_file])
+
+    IO.puts(
+      "==Part 01== \nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
+  end
+
+  # ======= Problema 01 - Contar a altura do grid
+  # após 2022 rochas caírem
+  defp part_01(input_file) do
+    # Lê o arquivo de entrada e armazena
     jets =
       File.read!(input_file)
       # Para evitar problemas no Windows
       |> String.replace("\r", "")
+      |> String.trim()
       |> String.graphemes()
 
-    rocks = %{
-      :horizontal => [{0, 0}, {0, 1}, {0, 2}, {0, 3}],
-      :cross => [{0, 1}, {1, 0}, {1, 1}, {1, 2}, {2, 1}],
-      :corner => [{0, 0}, {0, 1}, {0, 2}, {1, 2}, {2, 2}],
-      :vertical => [{0, 0}, {1, 0}, {2, 0}, {3, 0}],
-      :square => [{0, 0}, {0, 1}, {1, 0}, {1, 1}]
-    }
+    # Os cinco modelos de rochas que caêm 
+    rocks_list = [
+      [{0, 0}, {0, 1}, {0, 2}, {0, 3}],           # horizontal
+      [{0, 1}, {1, 0}, {1, 1}, {1, 2}, {2, 1}],   # cruz
+      [{0, 0}, {0, 1}, {0, 2}, {1, 2}, {2, 2}],   # esquina
+      [{0, 0}, {1, 0}, {2, 0}, {3, 0}],           # vertical
+      [{0, 0}, {0, 1}, {1, 0}, {1, 1}]            # quadrado
+    ]
 
+    # Estado inicial 
     initial_grid = MapSet.new([{0, 0}, {0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {0, 6}])
 
-    #{_new_rock, new_grid, _new_move, new_jets} =
-    #  drop_rock(rocks.horizontal, initial_grid, jets)
+    # Número de rochas
+    number_of_rocks = 2022
 
-    #{_, res, _, _} =
-    #  drop_rock(rocks.cross, new_grid, new_jets)
-
-    #res
-
-    rocks_list = [rocks.horizontal, rocks.cross, rocks.corner, rocks.vertical, rocks.square]
-
+    # Roda a simulçao
     {_, res_grid, _} =
-    Enum.reduce(0..2023, {rocks_list, initial_grid, jets}, fn _, acc ->
-      {curr_rocks_list, curr_grid, curr_jets} = acc
+      Enum.reduce(0..(number_of_rocks - 1), {rocks_list, initial_grid, jets}, fn _, acc ->
+        {curr_rocks_list, curr_grid, curr_jets} = acc
 
-      {curr_rock, remaining_rocks} = List.pop_at(curr_rocks_list, 0)
-      new_rocks_list = List.insert_at(remaining_rocks, -1, curr_rock)
+        {curr_rock, remaining_rocks} = List.pop_at(curr_rocks_list, 0)
+        new_rocks_list = List.insert_at(remaining_rocks, -1, curr_rock)
 
-      {_, new_grid, _, new_jets} = drop_rock(curr_rock, curr_grid, curr_jets)
+        {_, new_grid, _, new_jets} = drop_rock(curr_rock, curr_grid, curr_jets)
 
-      {new_rocks_list, new_grid, new_jets}
-
-    end)
+        {new_rocks_list, new_grid, new_jets}
+      end)
 
     grid_highest_row(res_grid)
-
   end
 
-  def position_rock(rock, grid) do
+  # - Posiciona uma rocha no ponto inicial
+  defp position_rock(rock, grid) do
     highest_row = grid_highest_row(grid)
 
     new_row = highest_row + 4
@@ -57,7 +65,8 @@ defmodule Day17 do
     |> Enum.map(fn {row, col} -> {row + new_row, col + new_col} end)
   end
 
-  def grid_highest_row(grid) do
+  # - Pega o ponto mais alto do grid
+  defp grid_highest_row(grid) do
     grid
     |> MapSet.to_list()
     |> List.keysort(0, :desc)
@@ -65,8 +74,8 @@ defmodule Day17 do
     |> elem(0)
   end
 
-  def drop_rock(rock, grid, jets) do
-
+  # - Simula a queda de uma rocha
+  defp drop_rock(rock, grid, jets) do
     rock_pos = position_rock(rock, grid)
     move = :lateral
 
@@ -82,56 +91,58 @@ defmodule Day17 do
       else
         {:cont, {new_rock, curr_grid, new_move, new_jets}}
       end
-
     end)
-
   end
 
-  def move_rock(rock, move, jets, grid) do
+  # - Move a rocha uma posição
+  # para o lado ou para baixo
+  defp move_rock(rock, move, jets, grid) do
     if move === :vertical do
       move_result = vertical_move(rock, grid)
       new_move = :lateral
       {move_result, new_move, jets}
     else
       {direction, remaining_jets} = List.pop_at(jets, 0)
-      new_jets = List.insert_at(remaining_jets, -1, direction)
+      new_jets = remaining_jets ++ [direction]
       new_move = :vertical
       move_result = lateral_move(rock, direction, grid)
       {move_result, new_move, new_jets}
     end
   end
 
-  def vertical_move(rock, grid) do
+  # - Executa o movimento vertical
+  defp vertical_move(rock, grid) do
+    new_rock = rock |> Enum.map(fn {row, col} -> {row - 1, col} end)
+    cant_move = Enum.any?(new_rock, fn point -> MapSet.member?(grid, point) end)
 
-      new_rock = rock |> Enum.map(fn {row, col} -> {row - 1, col} end)
-      cant_move =
-        Enum.any?(new_rock, fn point -> MapSet.member?(grid, point) end)
-
-      if cant_move do
-        {:stopped, rock}
-      else
-        {:moved, new_rock}
-      end
-
+    if cant_move do
+      {:stopped, rock}
+    else
+      {:moved, new_rock}
+    end
   end
 
-  def lateral_move(rock, direction, grid) do
-
+  # - Executa o movimento horizontal
+  defp lateral_move(rock, direction, grid) do
     cond do
       direction === "<" ->
         left_move(rock, grid)
+
       direction === ">" ->
         right_move(rock, grid)
-    end
 
+      true ->
+        raise("Error!\nReceived: " <> direction)
+    end
   end
 
-  def left_move(rock, grid) do
+  defp left_move(rock, grid) do
     new_rock = rock |> Enum.map(fn {row, column} -> {row, column - 1} end)
 
-    cant_move = Enum.any?(new_rock, fn point ->
-      MapSet.member?(grid, point) or point |> elem(1) < 0
-    end)
+    cant_move =
+      Enum.any?(new_rock, fn point ->
+        MapSet.member?(grid, point) or point |> elem(1) < 0
+      end)
 
     if cant_move do
       {:stopped, rock}
@@ -140,12 +151,13 @@ defmodule Day17 do
     end
   end
 
-  def right_move(rock, grid) do
+  defp right_move(rock, grid) do
     new_rock = rock |> Enum.map(fn {row, column} -> {row, column + 1} end)
 
-    cant_move = Enum.any?(new_rock, fn point ->
-      MapSet.member?(grid, point) or point |> elem(1) > 6
-    end)
+    cant_move =
+      Enum.any?(new_rock, fn point ->
+        MapSet.member?(grid, point) or point |> elem(1) > 6
+      end)
 
     if cant_move do
       {:stopped, rock}
@@ -153,5 +165,4 @@ defmodule Day17 do
       {:moved, new_rock}
     end
   end
-
 end
