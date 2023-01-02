@@ -20,13 +20,30 @@ defmodule Day17 do
 
     initial_grid = MapSet.new([{0, 0}, {0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {0, 6}])
 
-    {_new_rock, new_grid, _new_move, new_jets} =
-      drop_rock(rocks.horizontal, initial_grid, jets)
+    #{_new_rock, new_grid, _new_move, new_jets} =
+    #  drop_rock(rocks.horizontal, initial_grid, jets)
 
-    {_, res, _, _} =
-      drop_rock(rocks.cross, new_grid, new_jets)
+    #{_, res, _, _} =
+    #  drop_rock(rocks.cross, new_grid, new_jets)
 
-    res
+    #res
+
+    rocks_list = [rocks.horizontal, rocks.cross, rocks.corner, rocks.vertical, rocks.square]
+
+    {_, res_grid, _} =
+    Enum.reduce(0..2023, {rocks_list, initial_grid, jets}, fn _, acc ->
+      {curr_rocks_list, curr_grid, curr_jets} = acc
+
+      {curr_rock, remaining_rocks} = List.pop_at(curr_rocks_list, 0)
+      new_rocks_list = List.insert_at(remaining_rocks, -1, curr_rock)
+
+      {_, new_grid, _, new_jets} = drop_rock(curr_rock, curr_grid, curr_jets)
+
+      {new_rocks_list, new_grid, new_jets}
+
+    end)
+
+    grid_highest_row(res_grid)
 
   end
 
@@ -51,22 +68,18 @@ defmodule Day17 do
   def drop_rock(rock, grid, jets) do
 
     rock_pos = position_rock(rock, grid)
-    highest_row = grid_highest_row(grid)
-    move = :horizontal
+    move = :lateral
 
     Enum.reduce_while(0..100, {rock_pos, grid, move, jets}, fn _, acc ->
       {curr_rock, curr_grid, curr_move, curr_jets} = acc
 
-      lowest_row =
-        curr_rock
-        |> List.keysort(0)
-        |> hd() |> elem(0)
+      {move_result, new_move, new_jets} = move_rock(curr_rock, curr_move, curr_jets, grid)
+      {status, new_rock} = move_result
 
-      if lowest_row - 1 === highest_row and curr_move === :vertical do
+      if status === :stopped and curr_move === :vertical do
         new_grid = MapSet.union(grid, MapSet.new(curr_rock))
         {:halt, {curr_rock, new_grid, curr_move, curr_jets}}
       else
-        {new_rock, new_move, new_jets} = move_rock(curr_rock, curr_move, curr_jets)
         {:cont, {new_rock, curr_grid, new_move, new_jets}}
       end
 
@@ -74,37 +87,71 @@ defmodule Day17 do
 
   end
 
-  def move_rock(rock, move, jets) do
+  def move_rock(rock, move, jets, grid) do
     if move === :vertical do
-      new_rock = rock |> Enum.map(fn {row, col} -> {row - 1, col} end)
-      new_move = :horizontal
-      {new_rock, new_move, jets}
+      move_result = vertical_move(rock, grid)
+      new_move = :lateral
+      {move_result, new_move, jets}
     else
       {direction, remaining_jets} = List.pop_at(jets, 0)
       new_jets = List.insert_at(remaining_jets, -1, direction)
       new_move = :vertical
-      new_rock = lateral_move(rock, direction)
-      {new_rock, new_move, new_jets}
+      move_result = lateral_move(rock, direction, grid)
+      {move_result, new_move, new_jets}
     end
   end
 
-  def lateral_move(rock, direction) do
+  def vertical_move(rock, grid) do
+
+      new_rock = rock |> Enum.map(fn {row, col} -> {row - 1, col} end)
+      cant_move =
+        Enum.any?(new_rock, fn point -> MapSet.member?(grid, point) end)
+
+      if cant_move do
+        {:stopped, rock}
+      else
+        {:moved, new_rock}
+      end
+
+  end
+
+  def lateral_move(rock, direction, grid) do
 
     cond do
-      direction === "<" and leftmost_column(rock) > 0 ->
-        rock |> Enum.map(fn {row, column} -> {row, column - 1} end)
-      direction === ">" and rightmost_column(rock) < 6 ->
-        rock |> Enum.map(fn {row, column} -> {row, column + 1} end)
-      true -> rock
+      direction === "<" ->
+        left_move(rock, grid)
+      direction === ">" ->
+        right_move(rock, grid)
     end
 
   end
 
-  def leftmost_column(rock) do
-    rock |> List.keysort(1) |> hd() |> elem(1)
+  def left_move(rock, grid) do
+    new_rock = rock |> Enum.map(fn {row, column} -> {row, column - 1} end)
+
+    cant_move = Enum.any?(new_rock, fn point ->
+      MapSet.member?(grid, point) or point |> elem(1) < 0
+    end)
+
+    if cant_move do
+      {:stopped, rock}
+    else
+      {:moved, new_rock}
+    end
   end
 
-  def rightmost_column(rock) do
-    rock |> List.keysort(1, :desc) |> hd() |> elem(1)
+  def right_move(rock, grid) do
+    new_rock = rock |> Enum.map(fn {row, column} -> {row, column + 1} end)
+
+    cant_move = Enum.any?(new_rock, fn point ->
+      MapSet.member?(grid, point) or point |> elem(1) > 6
+    end)
+
+    if cant_move do
+      {:stopped, rock}
+    else
+      {:moved, new_rock}
+    end
   end
+
 end
