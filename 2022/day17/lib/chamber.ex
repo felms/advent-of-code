@@ -1,5 +1,4 @@
 defmodule Chamber do
-
   # - Simula a queda de uma rocha
   def drop_rock(rock, grid, jets) do
     rock_pos = position_rock(rock, grid)
