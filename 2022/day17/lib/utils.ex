@@ -17,14 +17,12 @@ defmodule Utils do
   end
 
   def get_grid_cache(grid) do
-    grid_string =
-      grid
-      |> MapSet.to_list()
-      |> highest_points()
-      |> normalize_points(grid)
-      |> Enum.map(fn {r, c} -> "{#{r},#{c}}" end)
-
-    Enum.join(grid_string)
+    grid
+    |> MapSet.to_list()
+    |> highest_points()
+    |> normalize_points(grid)
+    |> Enum.map(fn {r, c} -> "{#{r},#{c}}" end)
+    |> Enum.join()
   end
 
   defp normalize_points(points, grid) do

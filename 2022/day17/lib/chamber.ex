@@ -32,18 +32,11 @@ defmodule Chamber do
 
   # - Move a rocha uma posição
   # para o lado ou para baixo
-  defp move_rock(rock, move, jets, grid) do
-    if move === :vertical do
-      move_result = vertical_move(rock, grid)
-      new_move = :lateral
-      {move_result, new_move, jets}
-    else
-      {direction, remaining_jets} = List.pop_at(jets, 0)
-      new_jets = remaining_jets ++ [direction]
-      new_move = :vertical
-      move_result = lateral_move(rock, direction, grid)
-      {move_result, new_move, new_jets}
-    end
+  defp move_rock(rock, :vertical, jets, grid), do: {vertical_move(rock, grid), :lateral, jets}
+
+  defp move_rock(rock, :lateral, jets, grid) do
+    {direction, remaining_jets} = List.pop_at(jets, 0)
+    {lateral_move(rock, direction, grid), :vertical, remaining_jets ++ [direction]}
   end
 
   # - Executa o movimento vertical
@@ -59,18 +52,8 @@ defmodule Chamber do
   end
 
   # - Executa o movimento horizontal
-  defp lateral_move(rock, direction, grid) do
-    cond do
-      direction === "<" ->
-        left_move(rock, grid)
-
-      direction === ">" ->
-        right_move(rock, grid)
-
-      true ->
-        raise("Error!\nReceived: " <> direction)
-    end
-  end
+  defp lateral_move(rock, "<", grid), do: left_move(rock, grid)
+  defp lateral_move(rock, ">", grid), do: right_move(rock, grid)
 
   defp left_move(rock, grid) do
     new_rock = rock |> Enum.map(fn {row, column} -> {row, column - 1} end)
