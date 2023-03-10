@@ -17,12 +17,11 @@ defmodule Day01 do
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
 
+    {time, result} = :timer.tc(&part_02/1, [input])
 
-     {time, result} = :timer.tc(&part_02/1, [input])
-
-     IO.puts(
-       "==Part 02== \nResult: #{result}" <>
-         "\nCalculated in #{time / 1_000_000} seconds\n"
+    IO.puts(
+      "==Part 02== \nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
     )
   end
 
@@ -37,7 +36,6 @@ defmodule Day01 do
   defp part_01([first_reading | _] = input) do
     measure_depth_increases(input, first_reading, 0)
   end
-
 
   defp part_02(input) do
     input
@@ -54,5 +52,4 @@ defmodule Day01 do
 
   defp measure_depth_increases([current_depth | depths], _previous_depth, number_of_increases),
     do: measure_depth_increases(depths, current_depth, number_of_increases)
-
 end
