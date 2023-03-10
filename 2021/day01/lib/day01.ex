@@ -17,12 +17,12 @@ defmodule Day01 do
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
 
-    # {time, result} = :timer.tc(&part_02/2, [input, 4_000_000])
+     {time, result} = :timer.tc(&part_02/1, [input])
 
-    # IO.puts(
-    #   "==Part 02== \nResult: #{result}" <>
-    #     "\nCalculated in #{time / 1_000_000} seconds\n"
-    # )
+     IO.puts(
+       "==Part 02== \nResult: #{result}" <>
+         "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   defp parse_input(file) do
@@ -37,6 +37,13 @@ defmodule Day01 do
     measure_depth_increases(input, first_reading, 0)
   end
 
+  defp part_02(input) do
+    input
+    |> Enum.chunk_every(3, 1, :discard)
+    |> Enum.map(&Enum.sum/1)
+    |> measure_depth_increases(1_000_000_000_000, 0)
+  end
+
   defp measure_depth_increases([], _previous_depth, number_of_increases), do: number_of_increases
 
   defp measure_depth_increases([current_depth | depths], previous_depth, number_of_increases)
@@ -45,4 +52,5 @@ defmodule Day01 do
 
   defp measure_depth_increases([current_depth | depths], _previous_depth, number_of_increases),
     do: measure_depth_increases(depths, current_depth, number_of_increases)
+
 end
