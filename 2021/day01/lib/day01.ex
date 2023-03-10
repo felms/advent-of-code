@@ -17,6 +17,7 @@ defmodule Day01 do
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
 
+
      {time, result} = :timer.tc(&part_02/1, [input])
 
      IO.puts(
@@ -36,6 +37,7 @@ defmodule Day01 do
   defp part_01([first_reading | _] = input) do
     measure_depth_increases(input, first_reading, 0)
   end
+
 
   defp part_02(input) do
     input
