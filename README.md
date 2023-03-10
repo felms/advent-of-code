@@ -1,2 +1,2 @@
-# Advent Of Code 2022
+# Advent Of Code 
 Minhas soluções para os problemas do Advent Of Code
