@@ -3,8 +3,6 @@ defmodule Day02 do
   Dia 02 do Advent of Code de 2021
   """
 
-  @initial_state %{horizontal_position: 0, depth: 0}
-
   # Roda o problema no modo correto (teste ou real)
   def run(:sample), do: solve("sample_input.txt")
   def run(:real), do: solve("input.txt")
@@ -20,16 +18,21 @@ defmodule Day02 do
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
 
-    # {time, result} = :timer.tc(&part_02/1, [input])
+    {time, result} = :timer.tc(&part_02/1, [input])
 
-    # IO.puts(
-    #   "==Part 02== \nResult: #{result}" <>
-    #     "\nCalculated in #{time / 1_000_000} seconds\n"
-    # )
+    IO.puts(
+      "==Part 02== \nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   defp part_01(input) do
-    res = exec_commands(@initial_state, input)
+    res = exec_commands(%{horizontal_position: 0, depth: 0}, input, :part_01)
+    res.horizontal_position * res.depth
+  end
+
+  defp part_02(input) do
+    res = exec_commands(%{horizontal_position: 0, depth: 0, aim: 0}, input, :part_02)
     res.horizontal_position * res.depth
   end
 
@@ -54,8 +57,28 @@ defmodule Day02 do
     end
   end
 
-  defp exec_commands(submarine, []), do: submarine
+  defp exec_command_02(submarine, {command, units}) do
+    case command do
+      "forward" ->
+        %{
+          submarine
+          | horizontal_position: submarine.horizontal_position + units,
+            depth: submarine.depth + submarine.aim * units
+        }
 
-  defp exec_commands(submarine, [command | rest]),
-    do: submarine |> exec_command(command) |> exec_commands(rest)
+      "down" ->
+        %{submarine | aim: submarine.aim + units}
+
+      "up" ->
+        %{submarine | aim: submarine.aim - units}
+    end
+  end
+
+  defp exec_commands(submarine, [], _), do: submarine
+
+  defp exec_commands(submarine, [command | rest], :part_01),
+    do: submarine |> exec_command(command) |> exec_commands(rest, :part_01)
+
+  defp exec_commands(submarine, [command | rest], :part_02),
+    do: submarine |> exec_command_02(command) |> exec_commands(rest, :part_02)
 end
