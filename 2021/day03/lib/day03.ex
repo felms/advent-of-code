@@ -18,21 +18,12 @@ defmodule Day03 do
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
 
-    # {time, result} = :timer.tc(&part_02/1, [input])
+    {time, result} = :timer.tc(&part_02/1, [input])
 
-    # IO.puts(
-    #   "==Part 02== \nResult: #{result}" <>
-    #     "\nCalculated in #{time / 1_000_000} seconds\n"
-    # )
-  end
-
-  defp part_01(input) do
-    input
-    |> Enum.zip()
-    |> Enum.map(&Tuple.to_list/1)
-    |> gamma_epsilon_rate(%{gamma_bits: [], epsilon_bits: []})
-    |> Enum.map(fn {_k, v} -> v |> Enum.join() |> String.to_integer(2) end)
-    |> Enum.product()
+    IO.puts(
+      "==Part 02== \nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   defp parse_input(file) do
@@ -41,6 +32,16 @@ defmodule Day03 do
     |> String.replace("\r", "")
     |> String.split("\n", trim: true)
     |> Enum.map(&String.graphemes/1)
+  end
+
+  # ===== PART 01
+  defp part_01(input) do
+    input
+    |> Enum.zip()
+    |> Enum.map(&Tuple.to_list/1)
+    |> gamma_epsilon_rate(%{gamma_bits: [], epsilon_bits: []})
+    |> Enum.map(fn {_k, v} -> v |> Enum.join() |> String.to_integer(2) end)
+    |> Enum.product()
   end
 
   defp gamma_epsilon_rate([], acc), do: acc
@@ -63,5 +64,63 @@ defmodule Day03 do
       |> List.keysort(1)
 
     %{least_common_bit: least_common_bit, most_common_bit: most_common_bit}
+  end
+
+  # ===== PART 02
+  defp part_02(input) do
+    oxygen_generator_rating(input) * co2_scrubber_rating(input)
+  end
+
+  defp oxygen_generator_rating(readings) do
+    filter_data(readings, 0, :oxygen_generator)
+    |> Enum.join()
+    |> String.to_integer(2)
+  end
+
+  defp co2_scrubber_rating(readings) do
+    filter_data(readings, 0, :co2_scrubber)
+    |> Enum.join()
+    |> String.to_integer(2)
+  end
+
+  defp filter_data(readings, _position, _equipment) when length(readings) == 1,
+    do: readings |> List.first()
+
+  defp filter_data(readings, position, equipment) do
+    criteria =
+      readings
+      |> Enum.zip()
+      |> Enum.map(&Tuple.to_list/1)
+      |> Enum.at(position)
+      |> criteria_bit(equipment)
+
+    filtered_readings =
+      readings
+      |> Enum.filter(fn item -> Enum.at(item, position) == criteria end)
+
+    filter_data(filtered_readings, position + 1, equipment)
+  end
+
+  defp criteria_bit(reading, :co2_scrubber), do: criteria_bit_csr(reading)
+  defp criteria_bit(reading, :oxygen_generator), do: criteria_bit_ogr(reading)
+
+  defp criteria_bit_ogr(reading) do
+    bits_freq = most_and_least_common_bit(reading)
+
+    if bits_freq.most_common_bit == bits_freq.least_common_bit do
+      1
+    else
+      bits_freq.most_common_bit
+    end
+  end
+
+  defp criteria_bit_csr(reading) do
+    bits_freq = most_and_least_common_bit(reading)
+
+    if bits_freq.most_common_bit == bits_freq.least_common_bit do
+      0
+    else
+      bits_freq.least_common_bit
+    end
   end
 end
