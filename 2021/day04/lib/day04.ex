@@ -18,12 +18,12 @@ defmodule Day04 do
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
 
-    # {time, result} = :timer.tc(&part_02/1, [input])
+    {time, result} = :timer.tc(&part_02/1, [input])
 
-    # IO.puts(
-    #   "==Part 02== \nResult: #{result}" <>
-    #     "\nCalculated in #{time / 1_000_000} seconds\n"
-    # )
+    IO.puts(
+      "==Part 02== \nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   defp parse_input(file) do
@@ -48,5 +48,10 @@ defmodule Day04 do
   # ===== PART 01
   defp part_01(input) do
     Bingo.play(input.numbers, input.boards)
+  end
+
+  # ===== PART 02
+  defp part_02(input) do
+    Bingo.last_winning_board(input.numbers, input.boards)
   end
 end
