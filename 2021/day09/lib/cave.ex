@@ -1,10 +1,22 @@
 defmodule Cave do
   def find_basins(heightmap) do
-    heightmap
-    |> Map.keys()
-    |> Enum.reject(&(Map.get(heightmap, &1) == 9))
-    |> Enum.map(&find_basin(&1, heightmap))
-    |> Enum.uniq()
+    points =
+      heightmap
+      |> Map.keys()
+      |> Enum.reject(&(Map.get(heightmap, &1) == 9))
+
+    find_basins(points, heightmap, [])
+  end
+
+  defp find_basins([], _heightmap, basins), do: basins
+
+  defp find_basins([current_point | points], heightmap, basins) do
+    if processed_point?(current_point, basins) do
+      find_basins(points, heightmap, basins)
+    else
+      new_basin = find_basin(current_point, heightmap)
+      find_basins(points, heightmap, [new_basin | basins])
+    end
   end
 
   defp find_basin(point, heightmap) do
@@ -25,5 +37,9 @@ defmodule Cave do
     [{x - 1, y}, {x + 1, y}, {x, y - 1}, {x, y + 1}]
     |> Enum.filter(&Map.has_key?(heightmap, &1))
     |> Enum.reject(&(Map.get(heightmap, &1) == 9))
+  end
+
+  defp processed_point?(point, basins) do
+    Enum.any?(basins, &MapSet.member?(&1, point))
   end
 end
