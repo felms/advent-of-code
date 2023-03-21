@@ -19,12 +19,12 @@ defmodule Day11 do
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
 
-    # {time, result} = :timer.tc(&part_02/1, [input])
+    {time, result} = :timer.tc(&part_02/1, [input])
 
-    # IO.puts(
-    #   "==Part 02== \nResult: #{result}" <>
-    #     "\nCalculated in #{time / 1_000_000} seconds\n"
-    # )
+    IO.puts(
+      "==Part 02== \nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   defp parse_input(file) do
@@ -51,8 +51,25 @@ defmodule Day11 do
   end
 
   # ======= Problema 02
-  # defp part_02(input) do
-  # end
+  defp part_02(input) do
+    total_octopuses =
+      input
+      |> Map.keys()
+      |> length()
+
+    {resulting_cave, total_flashes, step} =
+      Enum.reduce_while(1..1_000_000, {input, 0}, fn step, {acc, flashes} ->
+        {cave, executed_flashes} = Cave.execute_step(acc)
+
+        if total_octopuses == executed_flashes do
+          {:halt, {cave, flashes + executed_flashes, step}}
+        else
+          {:cont, {cave, flashes + executed_flashes}}
+        end
+      end)
+
+    "\nCave: \n#{resulting_cave |> print_matrix()} \n\nFlashes: #{total_flashes} \n\nStopped at step: #{step}"
+  end
 
   # ======= Funções auxiliares
   defp parse_row(row) do
