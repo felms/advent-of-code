@@ -15,20 +15,23 @@ defmodule Cave do
   end
 
   defp execute_flashes(octopuses) do
-    execute_flashes(octopuses, points_to_flash(octopuses, []), [])
+    execute_flashes(octopuses, points_to_flash(octopuses, []), [], 0)
   end
 
-  defp execute_flashes(octopuses, [], flashed_points) do
-    Enum.reduce(flashed_points, octopuses, fn point, acc ->
-      Map.put(acc, point, 0)
-    end)
+  defp execute_flashes(octopuses, [], flashed_points, executed_flashes) do
+    {
+      Enum.reduce(flashed_points, octopuses, fn point, acc ->
+        Map.put(acc, point, 0)
+      end),
+      executed_flashes
+    }
   end
 
-  defp execute_flashes(octopuses, [point | remaining], flashed_points) do
+  defp execute_flashes(octopuses, [point | remaining], flashed_points, executed_flashes) do
     updated = execute_flash(point, octopuses)
     updated_to_flash = (remaining ++ points_to_flash(updated, flashed_points)) |> Enum.uniq()
 
-    execute_flashes(updated, updated_to_flash, [point | flashed_points])
+    execute_flashes(updated, updated_to_flash, [point | flashed_points], executed_flashes + 1)
   end
 
   defp points_to_flash(octopuses, flashed_points),

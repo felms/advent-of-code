@@ -41,10 +41,13 @@ defmodule Day11 do
 
   # ======= Problema 01
   defp part_01(input) do
-    Enum.reduce(1..@number_of_steps, input, fn _, acc ->
-      Cave.execute_step(acc)
-    end)
-    |> print_matrix()
+    {resulting_cave, total_flashes} =
+      Enum.reduce(1..@number_of_steps, {input, 0}, fn _, {acc, flashes} ->
+        {cave, executed_flashes} = Cave.execute_step(acc)
+        {cave, flashes + executed_flashes}
+      end)
+
+    "\nCave: \n#{resulting_cave |> print_matrix()} \n\nFlashes: #{total_flashes}"
   end
 
   # ======= Problema 02
