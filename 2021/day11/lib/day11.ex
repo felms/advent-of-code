@@ -2,6 +2,7 @@ defmodule Day11 do
   @moduledoc """
   Dia 11 do Advent of Code de 2021
   """
+  @number_of_steps 100
 
   # Roda o problema no modo correto (teste ou real)
   def run(:sample), do: solve("sample_input.txt")
@@ -33,14 +34,16 @@ defmodule Day11 do
     |> String.split("\n", trim: true)
     |> Enum.with_index()
     |> Enum.map(fn {row, index} -> {index, parse_row(row)} end)
-    |> Enum.map(&to_matrix/1)  
+    |> Enum.map(&to_matrix/1)
     |> List.flatten()
     |> Enum.into(%{})
   end
 
   # ======= Problema 01
   defp part_01(input) do
-    input
+    Enum.reduce(1..@number_of_steps, input, fn _, acc ->
+      Cave.execute_step(acc)
+    end)
     |> print_matrix()
   end
 
@@ -68,11 +71,12 @@ defmodule Day11 do
       |> Enum.map(fn {{x, _y}, _v} -> x end)
       |> Enum.max()
 
-    Enum.reduce(0..max_x, [], fn index, acc -> 
-      row = 
-        Enum.filter(matrix, fn {{x, _y}, _v} -> x == index end) 
-        |> Enum.sort(fn {{_, y0}, _}, {{_, y1}, _}  -> y1 >= y0 end)
+    Enum.reduce(0..max_x, [], fn index, acc ->
+      row =
+        Enum.filter(matrix, fn {{x, _y}, _v} -> x == index end)
+        |> Enum.sort(fn {{_, y0}, _}, {{_, y1}, _} -> y1 >= y0 end)
         |> print_row()
+
       [row | acc]
     end)
     |> Enum.reverse()
@@ -80,9 +84,8 @@ defmodule Day11 do
   end
 
   defp print_row(row) do
-    row 
+    row
     |> Enum.map(fn {{_x, _y}, v} -> Integer.to_string(v) end)
     |> Enum.join()
   end
-
 end
