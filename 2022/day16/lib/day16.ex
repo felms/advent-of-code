@@ -1,19 +1,27 @@
 defmodule Day16 do
   @moduledoc """
-  Dia 16 do Advento of Code de 2022
+  Dia 16 do Advent of Code de 2022
   """
-  def part_01(mode \\ :test) do
+  def run(mode \\ :test) do
     case mode do
-      :test -> run("sample_input.txt")
-      :input -> run("input.txt")
+      :test -> solve("sample_input.txt")
+      :input -> solve("input.txt")
     end
   end
 
-  defp run(input_file) do
+  defp solve(input_file) do
     graph = parse_input(input_file)
 
-    dists = Tunnels.calc_distances(graph)
-    Tunnels.pressure_release(graph, 30, "AA", dists, [])
+    dists =
+      graph
+      |> Tunnels.calc_distances()
+
+    {time, result} = :timer.tc(&Tunnels.pressure_release/5, [graph, 30, "AA", dists, []])
+
+    IO.puts(
+      "==Part 01== \nResult:\n#{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   # - Faz o parse do input e gera uma tabela com
@@ -25,38 +33,27 @@ defmodule Day16 do
     # Para evitar problemas no Windows
     |> String.replace("\r", "")
     |> String.split("\n", trim: true)
-    |> Enum.reduce(%{}, fn scan, acc ->
-      [valve_string, tunnels_string] = String.split(scan, ";", trim: true)
-
-      valve = parse_valve(valve_string)
-      valve_name = Map.get(valve, "valve")
-      flow_rate = Map.get(valve, "flow_rate") |> String.to_integer()
-      tunnels = parse_tunnels(tunnels_string)
-
-      curr_valve = %{
-        flow_rate: flow_rate,
-        tunnels: tunnels
-      }
-
-      Map.put(acc, valve_name, curr_valve)
-    end)
+    |> Enum.map(&parse_valve/1)
+    |> Enum.into(%{})
   end
 
   # - Parse de uma 'válvula' do input separando em
   # nome e taxa de fluxo
   defp parse_valve(valve_string) do
-    Regex.named_captures(
-      ~r/Valve (?<valve>[A-Z]{2}) has flow rate=(?<flow_rate>\d+)/,
-      valve_string
-    )
+    %{"name" => name, "flow_rate" => flow_rate, "tunnels" => tunnels} =
+      Regex.named_captures(
+        ~r/Valve (?<name>[A-Z]{2}) has flow rate=(?<flow_rate>\d+); (?<tunnels>tunnels?.*)/,
+        valve_string
+      )
+
+    {name, %{flow_rate: String.to_integer(flow_rate), tunnels: parse_tunnels(tunnels)}}
   end
 
   # - Cria a lista com os túneis acessiveis
   # apartir do ponto atual
   defp parse_tunnels(tunnels_string) do
     tunnels_string
-    |> String.replace(~r/.*(valve |valves )/, "")
-    |> String.replace(" ", "")
-    |> String.split(",", trim: true)
+    |> String.replace(~r/tunnels? leads? to valves? /, "")
+    |> String.split(", ", trim: true)
   end
 end
