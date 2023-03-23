@@ -2,17 +2,26 @@ defmodule Day16 do
   @moduledoc """
   Dia 16 do Advent of Code de 2022
   """
-  def part_01(mode \\ :test) do
+  def run(mode \\ :test) do
     case mode do
-      :test -> run("sample_input.txt")
-      :input -> run("input.txt")
+      :test -> solve("sample_input.txt")
+      :input -> solve("input.txt")
     end
   end
 
-  defp run(input_file) do
-    graph =
-      parse_input(input_file)
+  defp solve(input_file) do
+    graph = parse_input(input_file)
+
+    dists =
+      graph
       |> Tunnels.calc_distances()
+
+    {time, result} = :timer.tc(&Tunnels.pressure_release/5, [graph, 30, "AA", dists, []])
+
+    IO.puts(
+      "==Part 01== \nResult:\n#{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   # - Faz o parse do input e gera uma tabela com
@@ -37,7 +46,7 @@ defmodule Day16 do
         valve_string
       )
 
-    {name, %{flow_rate: flow_rate, tunnels: parse_tunnels(tunnels)}}
+    {name, %{flow_rate: String.to_integer(flow_rate), tunnels: parse_tunnels(tunnels)}}
   end
 
   # - Cria a lista com os túneis acessiveis
