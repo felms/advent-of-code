@@ -4,17 +4,17 @@ defmodule Chamber do
     rock_pos = position_rock(rock, grid)
     move = :lateral
 
-    Enum.reduce_while(0..100, {rock_pos, grid, move, jets}, fn _, acc ->
-      {curr_rock, curr_grid, curr_move, curr_jets} = acc
+    Enum.reduce_while(0..100, {rock_pos, move, jets}, fn _, acc ->
+      {curr_rock, curr_move, curr_jets} = acc
 
       {move_result, new_move, new_jets} = move_rock(curr_rock, curr_move, curr_jets, grid)
       {status, new_rock} = move_result
-
+      # TODO testar eliminar o curr_grid (acho q não estou usando para nada)
       if status === :stopped and curr_move === :vertical do
         new_grid = MapSet.union(grid, MapSet.new(curr_rock))
         {:halt, {curr_rock, new_grid, curr_move, curr_jets}}
       else
-         {:cont, {new_rock, curr_grid, new_move, new_jets}}
+         {:cont, {new_rock, new_move, new_jets}}
       end
     end)
   end
