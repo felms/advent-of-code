@@ -1,22 +1,22 @@
 defmodule Chamber do
   # - Simula a queda de uma rocha
   def drop_rock(rock, grid, jets) do
-    rock_pos = position_rock(rock, grid)
+    positioned_rock = position_rock(rock, grid)
     move = :lateral
 
-    Enum.reduce_while(0..100, {rock_pos, move, jets}, fn _, acc ->
-      {curr_rock, curr_move, curr_jets} = acc
+    drop_rock(positioned_rock, jets, grid, move)
+  end
 
-      {move_result, new_move, new_jets} = move_rock(curr_rock, curr_move, curr_jets, grid)
-      {status, new_rock} = move_result
-      # TODO testar eliminar o curr_grid (acho q não estou usando para nada)
-      if status === :stopped and curr_move === :vertical do
-        new_grid = MapSet.union(grid, MapSet.new(curr_rock))
-        {:halt, {curr_rock, new_grid, curr_move, curr_jets}}
-      else
-         {:cont, {new_rock, new_move, new_jets}}
-      end
-    end)
+  defp drop_rock(rock, jets, grid, move) do
+    {move_result, new_move, new_jets} = move_rock(rock, move, jets, grid)
+    {status, new_rock} = move_result
+
+    if status === :stopped and move === :vertical do
+      new_grid = MapSet.union(grid, MapSet.new(rock))
+      {new_grid, jets}
+    else
+      drop_rock(new_rock, new_jets, grid, new_move)
+    end
   end
 
   # - Posiciona uma rocha no ponto inicial

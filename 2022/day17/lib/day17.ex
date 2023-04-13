@@ -37,7 +37,6 @@ defmodule Day17 do
   # ======= Problema 01 - Contar a altura do grid
   # após 2022 rochas caírem
   defp part_01(input_file) do
-
     File.read!(input_file)
     # Para evitar problemas no Windows
     |> String.replace("\r", "")
@@ -53,7 +52,7 @@ defmodule Day17 do
     pos = rem(current_rock_number, @types_of_rocks)
 
     curr_rock = Enum.at(rocks_list, pos)
-    {_, new_grid, _, new_jets} = Chamber.drop_rock(curr_rock, grid, jets)
+    {new_grid, new_jets} = Chamber.drop_rock(curr_rock, grid, jets)
 
     run_simulation(new_jets, current_rock_number + 1, number_of_rocks, rocks_list, new_grid)
   end
