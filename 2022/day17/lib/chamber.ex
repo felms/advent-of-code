@@ -14,7 +14,7 @@ defmodule Chamber do
         new_grid = MapSet.union(grid, MapSet.new(curr_rock))
         {:halt, {curr_rock, new_grid, curr_move, curr_jets}}
       else
-        {:cont, {new_rock, curr_grid, new_move, new_jets}}
+         {:cont, {new_rock, curr_grid, new_move, new_jets}}
       end
     end)
   end

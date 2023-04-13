@@ -2,6 +2,8 @@ defmodule Day17 do
   @moduledoc """
   Dia 17 do Advent of Code 2022
   """
+  # Quantidade de tipos de rochas
+  @types_of_rocks 5
 
   # Os cinco modelos de rochas que caêm
   @rocks_list [
@@ -35,28 +37,25 @@ defmodule Day17 do
   # ======= Problema 01 - Contar a altura do grid
   # após 2022 rochas caírem
   defp part_01(input_file) do
-    # Lê o arquivo de entrada e armazena
-    jets =
-      File.read!(input_file)
-      # Para evitar problemas no Windows
-      |> String.replace("\r", "")
-      |> String.trim()
-      |> String.graphemes()
 
-    # Roda a simulçao
-    {_, res_grid, _} =
-      Enum.reduce(1..@number_of_rocks, {@rocks_list, @initial_grid, jets}, fn _, acc ->
-        {curr_rocks_list, curr_grid, curr_jets} = acc
+    File.read!(input_file)
+    # Para evitar problemas no Windows
+    |> String.replace("\r", "")
+    |> String.trim()
+    |> String.graphemes()
+    |> run_simulation(0, @number_of_rocks, @rocks_list, @initial_grid)
+    |> Utils.grid_highest_row()
+  end
 
-        {curr_rock, remaining_rocks} = List.pop_at(curr_rocks_list, 0)
-        new_rocks_list = List.insert_at(remaining_rocks, -1, curr_rock)
+  defp run_simulation(_jets, rocks, rocks, _rocks_list, grid), do: grid
 
-        {_, new_grid, _, new_jets} = Chamber.drop_rock(curr_rock, curr_grid, curr_jets)
+  defp run_simulation(jets, current_rock_number, number_of_rocks, rocks_list, grid) do
+    pos = rem(current_rock_number, @types_of_rocks)
 
-        {new_rocks_list, new_grid, new_jets}
-      end)
+    curr_rock = Enum.at(rocks_list, pos)
+    {_, new_grid, _, new_jets} = Chamber.drop_rock(curr_rock, grid, jets)
 
-    Utils.grid_highest_row(res_grid)
+    run_simulation(new_jets, current_rock_number + 1, number_of_rocks, rocks_list, new_grid)
   end
 
   def part_02(input_file) do
