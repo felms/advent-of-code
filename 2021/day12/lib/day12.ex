@@ -13,12 +13,12 @@ defmodule Day12 do
   defp solve(input_file) do
     input = parse_input(input_file)
 
-    # {time, result} = :timer.tc(&part_01/1, [input])
+    {time, result} = :timer.tc(&part_01/1, [input])
 
-    # IO.puts(
-    #   "==Part 01== \nResult:\n#{result}" <>
-    #     "\nCalculated in #{time / 1_000_000} seconds\n"
-    # )
+    IO.puts(
+      "==Part 01== \nResult:\n#{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
 
     # {time, result} = :timer.tc(&part_02/1, [input])
 
@@ -53,5 +53,15 @@ defmodule Day12 do
       entries,
       Map.put(graph, from, [to | from_tunnels]) |> Map.put(to, [from | to_tunnels])
     )
+  end
+
+  # ======= Problema 01 
+  # Gerar todos os caminhos possíves de "start" 
+  # até "end" passando por cada _caverna pequena_
+  # no máximo um vez.
+  def part_01(input) do
+    input
+    |> Cave.list_paths()
+    |> length()
   end
 end
