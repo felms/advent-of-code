@@ -33,10 +33,12 @@ defmodule Day01 do
     |> Enum.map(&String.to_integer/1)
   end
 
+  # ======= Problema 01
   defp part_01([first_reading | _] = input) do
     measure_depth_increases(input, first_reading, 0)
   end
 
+  # ======= Problema 02
   defp part_02(input) do
     input
     |> Enum.chunk_every(3, 1, :discard)
@@ -44,6 +46,7 @@ defmodule Day01 do
     |> measure_depth_increases(1_000_000_000_000, 0)
   end
 
+  # ======= Utilitários
   defp measure_depth_increases([], _previous_depth, number_of_increases), do: number_of_increases
 
   defp measure_depth_increases([current_depth | depths], previous_depth, number_of_increases)
