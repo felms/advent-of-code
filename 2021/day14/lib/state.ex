@@ -1,5 +1,5 @@
 defmodule State do
-  defstruct rules: %{}, pair_freq: [], letter_freq: %{}
+  defstruct rules: %{}, pair_freq: %{}, letter_freq: %{}
 
   def init(template, rules_string) do
     rules = parse_rules(rules_string)
