@@ -26,11 +26,13 @@ defmodule Day02 do
     )
   end
 
+  # ======= Problema 01
   defp part_01(input) do
     res = exec_commands(%{horizontal_position: 0, depth: 0}, input, :part_01)
     res.horizontal_position * res.depth
   end
 
+  # ======= Problema 02
   defp part_02(input) do
     res = exec_commands(%{horizontal_position: 0, depth: 0, aim: 0}, input, :part_02)
     res.horizontal_position * res.depth
@@ -49,6 +51,7 @@ defmodule Day02 do
     {command, String.to_integer(units)}
   end
 
+  # ======= Utilitários
   defp exec_command(submarine, {command, units}) do
     case command do
       "forward" -> %{submarine | horizontal_position: submarine.horizontal_position + units}
