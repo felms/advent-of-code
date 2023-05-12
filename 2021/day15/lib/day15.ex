@@ -36,7 +36,6 @@ defmodule Day15 do
       |> Enum.map(&parse_row/1)
       |> List.flatten()
       |> Map.new()
-
   end
 
   defp parse_row({row, y}) do
