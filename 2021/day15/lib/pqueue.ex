@@ -80,10 +80,10 @@ defmodule PQueue do
   defp swim(heap, item_index) do
     parent_index = div(item_index - 1, 2)
 
-    elem = Enum.at(heap, item_index)
-    parent = Enum.at(heap, parent_index)
+    {_elem_coord, elem_priority} = Enum.at(heap, item_index)
+    {_parent_coord, parent_priority} = Enum.at(heap, parent_index)
 
-    if parent <= elem do
+    if parent_priority <= elem_priority do
       heap
     else
       heap
@@ -103,19 +103,19 @@ defmodule PQueue do
         l >= length(heap) ->
           index
 
-        r >= length(heap) and Enum.at(heap, l) < Enum.at(heap, index) ->
+        r >= length(heap) and Enum.at(heap, l) |> elem(1) < Enum.at(heap, index) |> elem(1) ->
           l
 
-        r >= length(heap) and Enum.at(heap, l) >= Enum.at(heap, index) ->
+        r >= length(heap) and Enum.at(heap, l) |> elem(1) >= Enum.at(heap, index) |> elem(1) ->
           index
 
         true ->
-          min_elem = Enum.min([Enum.at(heap, index), Enum.at(heap, l), Enum.at(heap, r)])
+          min_elem = Enum.min([Enum.at(heap, index) |> elem(1), Enum.at(heap, l) |> elem(1), Enum.at(heap, r) |> elem(1)])
 
           cond do
-            min_elem == Enum.at(heap, index) -> index
-            min_elem == Enum.at(heap, l) -> l
-            min_elem == Enum.at(heap, r) -> r
+            min_elem == Enum.at(heap, index) |> elem(1) -> index
+            min_elem == Enum.at(heap, l) |> elem(1) -> l
+            min_elem == Enum.at(heap, r) |> elem(1) -> r
           end
       end
 
