@@ -69,14 +69,14 @@ defmodule PQueue do
   @doc """
   Diminuição da prioridade de um elemento.
   """
-  @spec decrease_key({heap :: list(), size :: integer()}, tuple()) :: {{heap :: list(), size :: integer()}}
+  @spec decrease_key({heap :: list(), size :: integer()}, tuple()) ::
+          {{heap :: list(), size :: integer()}}
   def decrease_key(queue, item) do
     heap =
       queue.heap
       |> Enum.reject(&(elem(&1, 0) == elem(item, 0)))
 
     %{queue | heap: insert_into_heap(heap, item)}
-
   end
 
   # ======= Funções auxiliares para manipulação da Binary Heap
@@ -123,7 +123,12 @@ defmodule PQueue do
           index
 
         true ->
-          min_elem = Enum.min([Enum.at(heap, index) |> elem(1), Enum.at(heap, l) |> elem(1), Enum.at(heap, r) |> elem(1)])
+          min_elem =
+            Enum.min([
+              Enum.at(heap, index) |> elem(1),
+              Enum.at(heap, l) |> elem(1),
+              Enum.at(heap, r) |> elem(1)
+            ])
 
           cond do
             min_elem == Enum.at(heap, index) |> elem(1) -> index
