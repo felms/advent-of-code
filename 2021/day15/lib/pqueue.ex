@@ -26,7 +26,7 @@ defmodule PQueue do
   @doc """
   Consulta (sem remover) o elemento com menor valor/prioridade.
   """
-  @spec peek({heap :: list(), size :: integer()}) :: integer()
+  @spec peek({heap :: list(), size :: integer()}) :: tuple()
   def peek(queue), do: queue.heap |> hd()
 
   @doc """
@@ -38,7 +38,7 @@ defmodule PQueue do
   @doc """
   Inserção de novo elemento.
   """
-  @spec insert({heap :: list(), size :: integer()}, item :: integer()) ::
+  @spec insert({heap :: list(), size :: integer()}, tuple()) ::
           {heap :: list(), size :: integer()}
   def insert(queue, item) do
     %{queue | heap: insert_into_heap(queue.heap, item), size: queue.size + 1}
@@ -48,7 +48,7 @@ defmodule PQueue do
   Remoção do elemento de menor valor/prioridade.
   """
   @spec poll({heap :: list(), size :: integer()}) ::
-          {{heap :: list(), size :: integer()}, elem :: integer()}
+          {{heap :: list(), size :: integer()}, tuple()}
   def poll(%PQueue{size: 0}), do: PQueue.new()
 
   def poll(queue) do
@@ -66,12 +66,25 @@ defmodule PQueue do
     }
   end
 
+  @doc """
+  Diminuição da prioridade de um elemento.
+  """
+  @spec decrease_key({heap :: list(), size :: integer()}, tuple()) :: {{heap :: list(), size :: integer()}}
+  def decrease_key(queue, item) do
+    heap =
+      queue.heap
+      |> Enum.reject(&(elem(&1, 0) == elem(item, 0)))
+
+    %{queue | heap: insert_into_heap(heap, item)}
+
+  end
+
   # ======= Funções auxiliares para manipulação da Binary Heap
 
   defp insert_into_heap(heap, item) do
     heap
     |> List.insert_at(-1, item)
-    |> swim(length(heap) - 1)
+    |> swim(length(heap))
   end
 
   defp swim(heap, 0), do: heap
