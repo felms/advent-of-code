@@ -14,6 +14,16 @@ defmodule PQueue do
   def new(), do: %PQueue{heap: [], size: 0}
 
   @doc """
+  Retorna uma nove Priority Queue com os itens da lista fornecida
+  """
+  @spec new(input :: list()) :: {heap :: list(), size :: integer()}
+  def new(input) do
+    Enum.reduce(input, new(), fn item, queue ->
+      insert(queue, item)
+    end)
+  end
+
+  @doc """
   Consulta (sem remover) o elemento com menor valor/prioridade.
   """
   @spec peek({heap :: list(), size :: integer()}) :: integer()
@@ -38,7 +48,7 @@ defmodule PQueue do
   Remoção do elemento de menor valor/prioridade.
   """
   @spec poll({heap :: list(), size :: integer()}) ::
-          {{heap :: list(), size :: integer()}, integer()}
+          {{heap :: list(), size :: integer()}, elem :: integer()}
   def poll(%PQueue{size: 0}), do: PQueue.new()
 
   def poll(queue) do
