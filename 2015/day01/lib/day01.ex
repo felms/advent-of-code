@@ -8,17 +8,17 @@ defmodule Day01 do
 
     {time, result} = :timer.tc(&part_01/1, [input])
 
-    # IO.puts(
-    #   "==Part 01== \nResult:\n#{result}" <>
-    #     "\nCalculated in #{time / 1_000_000} seconds\n"
-    # )
+    IO.puts(
+      "==Part 01== \nResult:\n#{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
 
-    #  {time, result} = :timer.tc(&part_02/1, [input])
+    {time, result} = :timer.tc(&part_02/1, [input])
 
-    #  IO.puts(
-    #    "==Part 02== \nResult: \n\n#{result}" <>
-    #      "\nCalculated in #{time / 1_000_000} seconds\n"
-    #  )
+    IO.puts(
+      "==Part 02== \nResult: \n\n#{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   defp parse_input(file) do
@@ -37,5 +37,13 @@ defmodule Day01 do
   defp count([")" | tail], counter), do: count(tail, counter - 1)
 
   # ======= Problema 02
-end
+  defp part_02(input) do
+    input
+    |> find_pos(0, 0)
+  end
 
+  defp find_pos([], _counter, pos), do: pos
+  defp find_pos(_, -1, pos), do: pos
+  defp find_pos(["(" | tail], counter, pos), do: find_pos(tail, counter + 1, pos + 1)
+  defp find_pos([")" | tail], counter, pos), do: find_pos(tail, counter - 1, pos + 1)
+end
