@@ -13,12 +13,12 @@ defmodule Day02 do
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
 
-    # {time, result} = :timer.tc(&part_02/1, [input])
+    {time, result} = :timer.tc(&part_02/1, [input])
 
-    # IO.puts(
-    #  "==Part 02== \nResult: \n\n#{result}" <>
-    #    "\nCalculated in #{time / 1_000_000} seconds\n"
-    # )
+    IO.puts(
+      "==Part 02== \nResult: \n\n#{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   defp parse_input(file) do
@@ -47,8 +47,19 @@ defmodule Day02 do
   end
 
   # ======= Problema 02
-  # defp part_02(input) do
-  #  input
-  #  |> find_pos(0, 0)
-  # end
+  defp part_02(input) do
+    input
+    |> Enum.map(&required_ribbon/1)
+    |> Enum.sum()
+  end
+
+  defp required_ribbon(box_dimensions) do
+    [l, w, h] = String.split(box_dimensions, "x", trim: true) |> Enum.map(&String.to_integer/1)
+
+    ribbon_for_bow = l * w * h
+
+    ribbon_to_wrap = [l, w, h] |> Enum.sort() |> Enum.take(2) |> Enum.sum() |> then(&(&1 * 2))
+
+    ribbon_to_wrap + ribbon_for_bow
+  end
 end
