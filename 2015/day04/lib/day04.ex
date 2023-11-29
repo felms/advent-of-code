@@ -3,23 +3,23 @@ defmodule Day04 do
   Dia 04 do Advent of Code de 2015
   """
 
-  def run(input) do
-    generate_new_hash(input, 0)
+  def run(input, part \\ :part01) do
+    generate_new_hash(input, 0, part)
   end
 
-  defp generate_new_hash(input_string, number) do
+  defp generate_new_hash(input_string, number, part) do
     candidate_number = input_string <> Integer.to_string(number)
+    number_of_zeros = if part == :part01, do: 5, else: 6
+    start_string = String.duplicate("0", number_of_zeros)
 
     generated_hash =
       :crypto.hash(:md5, candidate_number)
       |> Base.encode16()
 
-    if generated_hash |> has_five_zeros?() do
+    if generated_hash |> String.starts_with?(start_string) do
       number
     else
-      generate_new_hash(input_string, number + 1)
+      generate_new_hash(input_string, number + 1, part)
     end
   end
-
-  defp has_five_zeros?(input_string), do: input_string |> String.starts_with?("00000")
 end
