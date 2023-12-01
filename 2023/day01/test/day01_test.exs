@@ -3,7 +3,6 @@ defmodule Day01Test do
   doctest Day01
 
   describe "tests Day01.get_calibration_value/1" do
-
     test "tests 1abc2" do
       assert Day01.get_calibration_value("1abc2") == 12
     end
@@ -19,7 +18,5 @@ defmodule Day01Test do
     test "tests treb7uchet" do
       assert Day01.get_calibration_value("treb7uchet") == 77
     end
-
   end
-
 end
