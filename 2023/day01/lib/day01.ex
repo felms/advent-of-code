@@ -1,6 +1,6 @@
 defmodule Day01 do
   @moduledoc """
-  Dia 04 do Advent of Code 2022
+  Dia 01 do Advent of Code 2023
   """
 
   def run(mode \\ :real_input) do
