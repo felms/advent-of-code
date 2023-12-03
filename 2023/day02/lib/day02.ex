@@ -22,12 +22,12 @@ defmodule Day02 do
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
 
-    # {time, result} = :timer.tc(&part_02/1, [input])
+    {time, result} = :timer.tc(&part_02/1, [input])
 
-    # IO.puts(
-    #   "==Part 02== \nResult: #{result}" <>
-    #     "\nCalculated in #{time / 1_000_000} seconds\n"
-    # )
+    IO.puts(
+      "==Part 02== \nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   # Problema 01
@@ -37,7 +37,30 @@ defmodule Day02 do
     |> Enum.sum()
   end
 
+  # Problema 02
+  def part_02(input) do
+    input
+    |> Enum.map(&minimum_necessary_cubes/1)
+    |> Enum.map(&power_of_set/1)
+    |> Enum.sum()
+  end
+
   # ======= Utilitários
+
+  # - Retorna a potência de um conjunto de cubos
+  def power_of_set(cubes) do
+    cubes.red * cubes.green * cubes.blue
+  end
+
+  # - Retorno o número mínimo de cubos necessários 
+  # para um jogo ser possível
+  def minimum_necessary_cubes(game) do
+    %{
+      red: game.handfuls |> Enum.map(fn handful -> handful.red end) |> Enum.max(),
+      green: game.handfuls |> Enum.map(fn handful -> handful.green end) |> Enum.max(),
+      blue: game.handfuls |> Enum.map(fn handful -> handful.blue end) |> Enum.max()
+    }
+  end
 
   # - Testa se um jogo é possível
   def is_possible(game) do

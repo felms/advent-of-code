@@ -100,4 +100,41 @@ defmodule Day02Test do
              |> Day02.is_possible()
     end
   end
+
+  describe "tests Day02.minimum_necessary_cubes/1" do
+    test "tests 'Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green'" do
+      assert "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green"
+             |> Day02.parse_game()
+             |> Day02.minimum_necessary_cubes() ==
+               %{red: 4, green: 2, blue: 6}
+    end
+
+    test "tests 'Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue'" do
+      assert "Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue"
+             |> Day02.parse_game()
+             |> Day02.minimum_necessary_cubes() ==
+               %{red: 1, green: 3, blue: 4}
+    end
+
+    test "tests 'Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red'" do
+      assert "Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red"
+             |> Day02.parse_game()
+             |> Day02.minimum_necessary_cubes() ==
+               %{red: 20, green: 13, blue: 6}
+    end
+
+    test "tests 'Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red'" do
+      assert "Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red"
+             |> Day02.parse_game()
+             |> Day02.minimum_necessary_cubes() ==
+               %{red: 14, green: 3, blue: 15}
+    end
+
+    test "tests 'Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green'" do
+      assert "Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"
+             |> Day02.parse_game()
+             |> Day02.minimum_necessary_cubes() ==
+               %{red: 6, green: 3, blue: 2}
+    end
+  end
 end
