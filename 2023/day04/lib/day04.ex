@@ -19,12 +19,12 @@ defmodule Day04 do
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
 
-    # {time, result} = :timer.tc(&part_02/1, [input])
+    {time, result} = :timer.tc(&part_02/1, [input])
 
-    # IO.puts(
-    #   "==Part 02== \nResult: #{result}" <>
-    #     "\nCalculated in #{time / 1_000_000} seconds\n"
-    # )
+    IO.puts(
+      "==Part 02== \nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   # Problema 01
@@ -37,9 +37,57 @@ defmodule Day04 do
     |> Enum.sum()
   end
 
+  # Problema 02
+  def part_02(input) do
+    state = input |> create_state()
+
+    process_cards(1, Enum.count(state), state)
+    |> Enum.map(fn {_k, v} -> v.copies end)
+    |> Enum.sum()
+  end
+
+  def create_state(cards) do
+    Enum.reduce(cards, %{}, fn card, acc ->
+      acc
+      |> Map.put(String.to_integer(card.card_number), %{
+        card_number: card.card_number,
+        winning_numbers: card.winning_numbers,
+        card_numbers: card.card_numbers,
+        copies: 1
+      })
+    end)
+  end
+
+  def update_state(current_to_update, last_to_update, _copies, state)
+      when current_to_update > last_to_update,
+      do: state
+
+  def update_state(current_to_update, last_to_update, copies, state) do
+    card_to_update = state[current_to_update]
+    new_card = %{card_to_update | copies: card_to_update.copies + copies}
+
+    update_state(
+      current_to_update + 1,
+      last_to_update,
+      copies,
+      Map.put(state, current_to_update, new_card)
+    )
+  end
+
+  def process_cards(current_card, last_card, state) when current_card > last_card, do: state
+
+  def process_cards(current_card, last_card, state) do
+    card = state[current_card]
+    matches = card_matches(card)
+
+    new_state = update_state(current_card + 1, current_card + matches, card.copies, state)
+
+    process_cards(current_card + 1, last_card, new_state)
+  end
+
   def card_matches(card) do
     card.card_numbers
-    |> Enum.count(fn number -> number in card.winning_numbers end)
+    |> Enum.count(&(&1 in card.winning_numbers))
   end
 
   def parse_input(input_string) do
