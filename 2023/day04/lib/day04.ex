@@ -30,16 +30,16 @@ defmodule Day04 do
   # Problema 01
   def part_01(input) do
     input
-    |> Enum.map(&card_points/1)
+    |> Enum.map(fn card ->
+      matches = card_matches(card)
+      if matches > 0, do: Integer.pow(2, matches - 1), else: 0
+    end)
     |> Enum.sum()
   end
 
-  def card_points(card) do
-    matches =
-      card.card_numbers
-      |> Enum.count(fn number -> number in card.winning_numbers end)
-
-    if matches > 0, do: Integer.pow(2, matches - 1), else: 0
+  def card_matches(card) do
+    card.card_numbers
+    |> Enum.count(fn number -> number in card.winning_numbers end)
   end
 
   def parse_input(input_string) do
@@ -49,12 +49,10 @@ defmodule Day04 do
   end
 
   def parse_card(input) do
-    [w, n] =
-      input
-      |> String.replace(~r/Card \d+:/, "")
-      |> String.split("|", trim: true)
+    [_, card_number, w, n] = Regex.run(~r/Card\s+(\d+):(.+)\|(.+)/, input)
 
     %{
+      card_number: card_number,
       winning_numbers: w |> String.split(~r/\s+/, trim: true),
       card_numbers: n |> String.split(~r/\s+/, trim: true)
     }
