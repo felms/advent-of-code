@@ -1,10 +1,7 @@
 defmodule Day03 do
   @moduledoc """
-  Dia 02 do Advent of Code 2023
+  Dia 03 do Advent of Code 2023
   """
-
-  # the bag contains only 12 red cubes, 13 green cubes, and 14 blue cubes
-  @max_cubes %{red: 12, green: 13, blue: 14}
 
   def run(mode \\ :real_input) do
     input_file = if mode == :sample, do: "sample_input.txt", else: "input.txt"
@@ -15,12 +12,12 @@ defmodule Day03 do
       |> String.replace("\r", "")
       |> parse_input()
 
-    # {time, result} = :timer.tc(&part_01/1, [input])
+    {time, result} = :timer.tc(&part_01/1, [input])
 
-    # IO.puts(
-    #   "==Part 01== \nResult: #{result}" <>
-    #     "\nCalculated in #{time / 1_000_000} seconds\n"
-    # )
+    IO.puts(
+      "==Part 01== \nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
 
     # {time, result} = :timer.tc(&part_02/1, [input])
 
@@ -47,5 +44,79 @@ defmodule Day03 do
       List.flatten(points)
     )
     |> Enum.into(%{})
+  end
+
+  # - Problema 01
+  def part_01(input) do
+    max_r = input |> Enum.map(fn {r, _c} -> r end) |> Enum.max()
+    max_c = input |> Enum.map(fn {_r, c} -> c end) |> Enum.max()
+
+    symbols_locations = get_symbols_locations(input)
+    |> Enum.map(fn {{r, c}, _symbol} -> {r, c} end)
+    |> MapSet.new()
+
+    get_numbers(input)
+    |> Enum.map(fn {k, v} ->
+      {
+        k,
+        v |> Enum.map(&get_neighbors/1) |> List.flatten() |> Enum.filter(fn {r, c} -> r >= 0 and r <= max_r and c >= 0 and c <= max_c end) |> MapSet.new()
+      }
+
+    end)
+    |> Enum.reject(fn {_number, locations} -> MapSet.disjoint?(locations, symbols_locations) end)
+    |> Enum.map(fn {k, _v} -> k end)
+    |> Enum.sum()
+
+
+  end
+
+  # - Retorna a localização dos símbolos no grid
+  def get_symbols_locations(input), do: input |> Enum.reject(fn {_k, v} -> v =~ ~r/\d|\./ end)
+
+  # - Retorna os vizinhos de um ponto
+  def get_neighbors({r, c}) do
+    [
+      {r - 1, c},
+      {r + 1, c},
+      {r, c - 1},
+      {r, c + 1},
+      {r - 1, c - 1},
+      {r - 1, c + 1},
+      {r + 1, c + 1},
+      {r + 1, c - 1}
+    ]
+  end
+
+  # - Percorre todas as linhas e procura os números em cada uma delas
+  def get_numbers(input) do
+    number_of_rows = input |> Enum.map(fn {{r, _y}, _v} -> r end) |> Enum.max()
+    number_of_columns = input |> Enum.map(fn {{_r, c}, _v} -> c end) |> Enum.max()
+
+    Enum.reduce(0..number_of_rows, [], fn current_row, acc ->
+      row = input |> Enum.filter(fn {{r, _c}, _v} -> r == current_row end) |> Map.new()
+      acc ++ get_numbers_from_row(0, number_of_columns, current_row, row, "", [], [])
+    end)
+    |> Enum.filter(fn {k, _v} -> k =~ ~r/\d+/ end)
+    |> Enum.map(fn {k, v} -> {String.to_integer(k), v} end)
+  end
+
+
+  # - Recupera todos os números de uma linha
+  # e as posições ocupadas por cada um deles
+  def get_numbers_from_row(current_index, length, _r, _row, current_number, positions, numbers) when current_index > length do
+    updated_numbers = numbers ++ [{current_number, positions}]
+    updated_numbers
+  end
+  def get_numbers_from_row(current_index, length, r, row, current_number, positions, numbers) do
+    current_value = row[{r, current_index}]
+
+    if current_value =~ ~r/\d/ do
+      updated_number = current_number <> current_value
+      updated_positions = positions ++ [{r, current_index}]
+      get_numbers_from_row(current_index + 1, length, r, row, updated_number, updated_positions, numbers)
+    else
+      updated_numbers = numbers ++ [{current_number, positions}]
+      get_numbers_from_row(current_index + 1, length, r, row, "", [], updated_numbers)
+    end
   end
 end
