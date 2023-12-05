@@ -19,12 +19,12 @@ defmodule Day03 do
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
 
-    # {time, result} = :timer.tc(&part_02/1, [input])
+    {time, result} = :timer.tc(&part_02/1, [input])
 
-    # IO.puts(
-    #   "==Part 02== \nResult: #{result}" <>
-    #     "\nCalculated in #{time / 1_000_000} seconds\n"
-    # )
+    IO.puts(
+      "==Part 02== \nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   def parse_input(input) do
@@ -51,23 +51,50 @@ defmodule Day03 do
     max_r = input |> Enum.map(fn {r, _c} -> r end) |> Enum.max()
     max_c = input |> Enum.map(fn {_r, c} -> c end) |> Enum.max()
 
-    symbols_locations = get_symbols_locations(input)
-    |> Enum.map(fn {{r, c}, _symbol} -> {r, c} end)
-    |> MapSet.new()
+    symbols_locations =
+      get_symbols_locations(input)
+      |> Enum.map(fn {{r, c}, _symbol} -> {r, c} end)
+      |> MapSet.new()
 
     get_numbers(input)
     |> Enum.map(fn {k, v} ->
       {
         k,
-        v |> Enum.map(&get_neighbors/1) |> List.flatten() |> Enum.filter(fn {r, c} -> r >= 0 and r <= max_r and c >= 0 and c <= max_c end) |> MapSet.new()
+        v
+        |> Enum.map(&get_neighbors/1)
+        |> List.flatten()
+        |> Enum.filter(fn {r, c} -> r >= 0 and r <= max_r and c >= 0 and c <= max_c end)
+        |> MapSet.new()
       }
-
     end)
     |> Enum.reject(fn {_number, locations} -> MapSet.disjoint?(locations, symbols_locations) end)
     |> Enum.map(fn {k, _v} -> k end)
     |> Enum.sum()
+  end
 
+  # - Problema 02
+  def part_02(input) do
+    numbers_list = get_numbers(input)
 
+    input
+    |> get_symbols_locations()
+    |> Enum.filter(fn {_k, v} -> v == "*" end)
+    |> Enum.map(fn {k, _v} -> get_neighbor_numbers(k, numbers_list) end)
+    |> Enum.filter(&(&1 |> length > 1))
+    |> Enum.map(&(&1 |> Enum.product()))
+    |> Enum.sum()
+  end
+
+  # - Retorna a lista com todos os números
+  # vizinhos de um ponto
+  def get_neighbor_numbers(point, numbers_list) do
+    point_neighbors = get_neighbors(point)
+
+    numbers_list
+    |> Enum.filter(fn {_number, locations} ->
+      locations |> Enum.any?(&(&1 in point_neighbors))
+    end)
+    |> Enum.map(fn {number, _locations} -> number end)
   end
 
   # - Retorna a localização dos símbolos no grid
@@ -100,20 +127,30 @@ defmodule Day03 do
     |> Enum.map(fn {k, v} -> {String.to_integer(k), v} end)
   end
 
-
   # - Recupera todos os números de uma linha
   # e as posições ocupadas por cada um deles
-  def get_numbers_from_row(current_index, length, _r, _row, current_number, positions, numbers) when current_index > length do
+  def get_numbers_from_row(current_index, length, _r, _row, current_number, positions, numbers)
+      when current_index > length do
     updated_numbers = numbers ++ [{current_number, positions}]
     updated_numbers
   end
+
   def get_numbers_from_row(current_index, length, r, row, current_number, positions, numbers) do
     current_value = row[{r, current_index}]
 
     if current_value =~ ~r/\d/ do
       updated_number = current_number <> current_value
       updated_positions = positions ++ [{r, current_index}]
-      get_numbers_from_row(current_index + 1, length, r, row, updated_number, updated_positions, numbers)
+
+      get_numbers_from_row(
+        current_index + 1,
+        length,
+        r,
+        row,
+        updated_number,
+        updated_positions,
+        numbers
+      )
     else
       updated_numbers = numbers ++ [{current_number, positions}]
       get_numbers_from_row(current_index + 1, length, r, row, "", [], updated_numbers)
