@@ -15,10 +15,16 @@ defmodule Day06 do
     {time, result} = :timer.tc(&part_01/1, [input])
 
     IO.puts(
-      "==Part 01== \nResult: #{result}" <>
+      "\n==Part 01== \n\nResult: #{result}" <>
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
 
+    {time, result} = :timer.tc(&part_02/1, [input])
+
+    IO.puts(
+      "\n==Part 02== \n\nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   def parse_input(input_string) do
@@ -45,19 +51,29 @@ defmodule Day06 do
     |> Enum.product()
   end
 
-  def ways_to_beat_the_record({time, record}) do
-    time
-    |> find_possible_distances()
-    |> Enum.filter(&(&1 > record))
-    |> Enum.count()
+  def part_02(input) do
+    input
+    |> Enum.reduce(["", ""], fn {t, r}, [acc_t, acc_r] ->
+      [
+        acc_t <> Integer.to_string(t),
+        acc_r <> Integer.to_string(r)
+      ]
+    end)
+    |> Enum.map(&String.to_integer/1)
+    |> List.to_tuple()
+    |> ways_to_beat_the_record()
   end
 
-  def find_possible_distances(time) do
+  def ways_to_beat_the_record({time, record}) do
     0..time
-    |> Enum.to_list()
-    |> Enum.reduce([], fn holding_time, acc ->
+    |> Enum.reduce(0, fn holding_time, acc ->
       distance = holding_time * (time - holding_time)
-      [distance | acc]
+
+      if distance > record do
+        acc + 1
+      else
+        acc
+      end
     end)
   end
 end
