@@ -19,12 +19,12 @@ defmodule Day05 do
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
 
-    # {time, result} = :timer.tc(&part_02/1, [input])
+    {time, result} = :timer.tc(&part_02/1, [input])
 
-    # IO.puts(
-    #   "==Part 02== \nResult: #{result}" <>
-    #     "\nCalculated in #{time / 1_000_000} seconds\n"
-    # )
+    IO.puts(
+      "==Part 02== \nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   def part_01({seeds_list, conversion_maps}) do
@@ -32,6 +32,23 @@ defmodule Day05 do
 
     seeds_list
     |> Enum.map(fn seed -> map_to_location(seed, first_map, conversion_maps) end)
+    |> Enum.min()
+  end
+
+  def part_02({seeds_list, conversion_maps}) do
+    [first_map] = conversion_maps |> Enum.filter(&(&1.from == "seed"))
+
+    seeds_list
+    |> Enum.chunk_every(2)
+    |> Enum.map(fn [start_of_range, length] ->
+      start_of_range..(start_of_range + length - 1)
+      |> Enum.reduce(1_000_000_000_000_000_000, fn current_seed, acc ->
+        min(
+          acc,
+          map_to_location(current_seed, first_map, conversion_maps)
+        )
+      end)
+    end)
     |> Enum.min()
   end
 
