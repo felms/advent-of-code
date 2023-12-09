@@ -44,4 +44,18 @@ defmodule Day09Test do
       assert Day09.predict_next_value([10, 13, 16, 21, 30, 45]) == [10, 13, 16, 21, 30, 45, 68]
     end
   end
+
+  describe "tests Day09.predict_first_value/1" do
+    test "tests [0, 3, 6, 9, 12, 15]" do
+      assert Day09.predict_first_value([0, 3, 6, 9, 12, 15]) == [-3, 0, 3, 6, 9, 12, 15]
+    end
+
+    test "tests [1, 3, 6, 10, 15, 21]" do
+      assert Day09.predict_first_value([1, 3, 6, 10, 15, 21]) == [0, 1, 3, 6, 10, 15, 21]
+    end
+
+    test "tests [10, 13, 16, 21, 30, 45, 68]" do
+      assert Day09.predict_first_value([10, 13, 16, 21, 30, 45]) == [5, 10, 13, 16, 21, 30, 45]
+    end
+  end
 end

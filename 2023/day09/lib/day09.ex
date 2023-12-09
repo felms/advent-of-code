@@ -18,6 +18,13 @@ defmodule Day09 do
       "\n==Part 01== \n\nResult: #{result}" <>
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
+
+    {time, result} = :timer.tc(&part_02/1, [input])
+
+    IO.puts(
+      "\n==Part 02== \n\nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   def parse_input(input_string) do
@@ -36,10 +43,24 @@ defmodule Day09 do
     |> Enum.sum()
   end
 
+  # - Problema 02
+  def part_02(input) do
+    input
+    |> Enum.map(&predict_first_value/1)
+    |> Enum.map(&(&1 |> hd()))
+    |> Enum.sum()
+  end
+
   def predict_next_value(values) do
     [values]
     |> calc_differences_list()
     |> collapse_lists()
+  end
+
+  def predict_first_value(values) do
+    [values]
+    |> calc_differences_list()
+    |> collapse_lists_2()
   end
 
   def calc_differences_list(lists) do
@@ -70,6 +91,22 @@ defmodule Day09 do
       new_value = Enum.at(first_list, -1) + Enum.at(second_list, -1)
 
       get_last_value([second_list |> List.insert_at(-1, new_value) | rest])
+    end
+  end
+
+  def collapse_lists_2(lists) do
+    [first_list | rest] = lists |> Enum.reverse()
+    get_first_value([[0 | first_list] | rest])
+  end
+
+  def get_first_value(lists) do
+    if length(lists) == 1 do
+      lists |> hd
+    else
+      [first_list, second_list | rest] = lists
+      new_value = hd(second_list) - hd(first_list)
+
+      get_first_value([[new_value | second_list] | rest])
     end
   end
 end
