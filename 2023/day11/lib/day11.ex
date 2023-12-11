@@ -67,7 +67,6 @@ defmodule Day11 do
   def assign_numbers_to_galaxies(grid) do
     grid
     |> Enum.sort()
-    |> Enum.filter(fn {_coord, v} -> v == "#" end)
     |> Enum.with_index(1)
     |> Enum.map(fn {{coord, _v}, index} -> {coord, index} end)
   end
@@ -79,6 +78,7 @@ defmodule Day11 do
 
     image
     |> Map.to_list()
+    |> Enum.filter(fn {_coord, v} -> v == "#" end)
     |> expand_rows(0, number_of_rows, number_of_columns)
     |> expand_columns(0, number_of_columns, number_of_rows)
   end
@@ -91,16 +91,14 @@ defmodule Day11 do
   def expand_rows(grid, current_row, number_of_rows, number_of_columns) do
     row = grid |> Enum.filter(fn {{r, _c}, _v} -> r == current_row end)
 
-    if row |> Enum.all?(fn {{_r, _c}, v} -> v == "." end) do
-      new_row = for x <- 0..number_of_columns, do: {{current_row, x}, "."}
-
+    if row == [] do
       new_grid =
         grid
         |> Enum.map(fn {{r, c}, v} ->
           if r >= current_row, do: {{r + 1, c}, v}, else: {{r, c}, v}
         end)
 
-      expand_rows(new_row ++ new_grid, current_row + 2, number_of_rows + 1, number_of_columns)
+      expand_rows(new_grid, current_row + 2, number_of_rows + 1, number_of_columns)
     else
       expand_rows(grid, current_row + 1, number_of_rows, number_of_columns)
     end
@@ -114,21 +112,14 @@ defmodule Day11 do
   def expand_columns(grid, current_column, number_of_columns, number_of_rows) do
     column = grid |> Enum.filter(fn {{_r, c}, _v} -> c == current_column end)
 
-    if column |> Enum.all?(fn {{_r, _c}, v} -> v == "." end) do
-      new_column = for x <- 0..number_of_rows, do: {{x, current_column}, "."}
-
+    if column == [] do
       new_grid =
         grid
         |> Enum.map(fn {{r, c}, v} ->
           if c >= current_column, do: {{r, c + 1}, v}, else: {{r, c}, v}
         end)
 
-      expand_columns(
-        new_column ++ new_grid,
-        current_column + 2,
-        number_of_columns + 1,
-        number_of_rows
-      )
+      expand_columns(new_grid, current_column + 2, number_of_columns + 1, number_of_rows)
     else
       expand_columns(grid, current_column + 1, number_of_columns, number_of_rows)
     end
