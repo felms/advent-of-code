@@ -39,16 +39,6 @@ defmodule Day12 do
     |> List.to_tuple()
   end
 
-  # - Conta o número de possíveis arranjos
-  # que batem com o critério
-  def count_possible_arrangements({springs_list, damaged_springs}) do
-    springs_list
-    |> generate_arrangements()
-    |> Enum.map(&generate_damaged_spring_report/1)
-    |> Enum.filter(&(&1 == damaged_springs))
-    |> Enum.count()
-  end
-
   # - Gera o "relatório de molas danificadas" com
   # base em um input
   def generate_damaged_spring_report(springs_list) do
@@ -58,48 +48,68 @@ defmodule Day12 do
     |> Enum.join(",")
   end
 
-  # - Gera todos os possíveis arranjos
-  # dado um possível input
-  def generate_arrangements(spring_list) do
-    generate_arrangements(spring_list, String.length(spring_list), 0, "", [])
+  # - Testa se uma combinação gerada bate
+  # o padrão
+  def matches?(combination, pattern) do
+    combination
+    |> generate_damaged_spring_report()
+    |> then(&(&1 == pattern))
   end
 
-  def generate_arrangements(_, list_length, position, current_arrengement, arrengements_list)
-      when position >= list_length,
-      do: arrengements_list ++ [current_arrengement]
+  # - Conta o número de possíveis arranjos
+  # que batem com o critério
+  def count_possible_arrangements({springs_list, damaged_springs}) do
+    count_possible_arrangements(springs_list, String.length(springs_list), 0, "", damaged_springs)
+  end
 
-  def generate_arrangements(
-        spring_list,
+  def count_possible_arrangements(
+        _springs_list,
         list_length,
         position,
         current_arrengement,
-        arrengements_list
+        pattern
+      )
+      when position >= list_length do
+    if matches?(current_arrengement, pattern), do: 1, else: 0
+  end
+
+  def count_possible_arrangements(
+        springs_list,
+        list_length,
+        position,
+        current_arrengement,
+        pattern
       ) do
-    case String.at(spring_list, position) do
-      "?" ->
-        generate_arrangements(
-          spring_list,
+    x = String.at(springs_list, position)
+
+    if x == "?" do
+      a =
+        count_possible_arrangements(
+          springs_list,
           list_length,
           position + 1,
           current_arrengement <> "#",
-          arrengements_list
-        ) ++
-          generate_arrangements(
-            spring_list,
-            list_length,
-            position + 1,
-            current_arrengement <> ".",
-            arrengements_list
-          )
+          pattern
+        )
 
-      x ->
-        generate_arrangements(
-          spring_list,
+      b =
+        count_possible_arrangements(
+          springs_list,
           list_length,
           position + 1,
-          current_arrengement <> x,
-          arrengements_list
+          current_arrengement <> ".",
+          pattern
         )
+
+      a + b
+    else
+      count_possible_arrangements(
+        springs_list,
+        list_length,
+        position + 1,
+        current_arrengement <> x,
+        pattern
+      )
     end
   end
 end
