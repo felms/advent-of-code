@@ -59,57 +59,22 @@ defmodule Day12 do
   # - Conta o número de possíveis arranjos
   # que batem com o critério
   def count_possible_arrangements({springs_list, damaged_springs}) do
-    count_possible_arrangements(springs_list, String.length(springs_list), 0, "", damaged_springs)
+    count_possible_arrangements(springs_list |> String.graphemes(), "", damaged_springs)
   end
 
-  def count_possible_arrangements(
-        _springs_list,
-        list_length,
-        position,
-        current_arrengement,
-        pattern
-      )
-      when position >= list_length do
+  def count_possible_arrangements([], current_arrengement, pattern) do
     if matches?(current_arrengement, pattern), do: 1, else: 0
   end
 
-  def count_possible_arrangements(
-        springs_list,
-        list_length,
-        position,
-        current_arrengement,
-        pattern
-      ) do
-    x = String.at(springs_list, position)
+  def count_possible_arrangements([current_spring | springs_list], current_arrengement, pattern) do
+    if current_spring == "?" do
+      a = count_possible_arrangements(springs_list, current_arrengement <> "#", pattern)
 
-    if x == "?" do
-      a =
-        count_possible_arrangements(
-          springs_list,
-          list_length,
-          position + 1,
-          current_arrengement <> "#",
-          pattern
-        )
-
-      b =
-        count_possible_arrangements(
-          springs_list,
-          list_length,
-          position + 1,
-          current_arrengement <> ".",
-          pattern
-        )
+      b = count_possible_arrangements(springs_list, current_arrengement <> ".", pattern)
 
       a + b
     else
-      count_possible_arrangements(
-        springs_list,
-        list_length,
-        position + 1,
-        current_arrengement <> x,
-        pattern
-      )
+      count_possible_arrangements(springs_list, current_arrengement <> current_spring, pattern)
     end
   end
 end
