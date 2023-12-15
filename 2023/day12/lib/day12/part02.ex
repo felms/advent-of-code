@@ -6,12 +6,25 @@ defmodule Day12.Part02 do
   def run(mode \\ :real_input) do
     input_file = if mode == :sample, do: "sample_input.txt", else: "input.txt"
 
-    _input =
+    input =
       File.read!(input_file)
       # Para evitar problemas no Windows
       |> String.replace("\r", "")
       |> parse_input()
-      |> Enum.map(&count_possible_arrangements/1)
+
+    {time, result} = :timer.tc(&part_02/1, [input])
+
+    IO.puts(
+      "\n==Part 01== \n\nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
+  end
+
+  # - Problema 02
+  def part_02(input) do
+    input
+    |> Enum.map(&count_possible_arrangements/1)
+    |> Enum.sum()
   end
 
   def parse_input(input_string) do
@@ -24,42 +37,54 @@ defmodule Day12.Part02 do
     [record, groups_string] = row |> String.split(~r/\s+/, trim: true)
 
     {
-      record |> String.graphemes,
+      ("." <> record <> ".") |> String.graphemes(),
       groups_string
       |> String.split(",", trim: true)
       |> Enum.map(&String.to_integer/1)
     }
   end
 
-  # - Testa se um grupo cabe no inicio de
-  # de um registro
-  def fits?(record, group) do
-    if record |> length() < group, do: false, else: record |> Enum.take(group) |> Enum.all?(& &1 in ["?", "#"])
+  # - Testa se um grupo cabe em um registro
+  def fits?([], _position, _group), do: false
+
+  def fits?(record, position, group) do
+    size = record |> length()
+
+    cond do
+      group > size -> false
+      position + group >= size -> false
+      record |> Enum.drop(position) |> Enum.take(group) |> Enum.any?(&(&1 == ".")) -> false
+      record |> Enum.take(position) |> Enum.any?(&(&1 == "#")) -> false
+      record |> Enum.at(position + group) == "#" -> false
+      true -> true
+    end
   end
 
   # - Conta o número de possíveis arranjos
   # que batem com o critério
   def count_possible_arrangements({record, group}), do: count_possible_arrangements(record, group)
+
   def count_possible_arrangements([], []), do: 1
-  def count_possible_arrangements([], _groups), do: 0
+  def count_possible_arrangements([], _group), do: 0
+
   def count_possible_arrangements(record, []) do
     if "#" in record, do: 0, else: 1
   end
 
   def count_possible_arrangements(record, [current_group | groups]) do
+    size = record |> length()
 
-    record |> IO.inspect()
-    current_group |> IO.inspect()
-    groups |> IO.inspect()
-
-    if not fits?(record, current_group) do
-      0
-    else
-      0..((record |> length) - current_group)
-      |> Enum.reduce(0, fn initial_index, acc ->
-        acc + count_possible_arrangements(record |> Enum.drop(initial_index + current_group), groups)
-      end)
-    end
-
+    0..size
+    |> Enum.reduce(0, fn pos, acc ->
+      if fits?(record, pos, current_group) do
+        acc +
+          count_possible_arrangements(
+            ["." | record |> Enum.drop(pos + current_group + 1)],
+            groups
+          )
+      else
+        acc
+      end
+    end)
   end
 end
