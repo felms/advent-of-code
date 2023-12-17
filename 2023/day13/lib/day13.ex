@@ -18,6 +18,13 @@ defmodule Day13 do
       "\n==Part 01== \n\nResult: #{result}" <>
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
+
+    {time, result} = :timer.tc(&part_02/1, [input])
+
+    IO.puts(
+      "\n==Part 02== \n\nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   # - Problema 01
@@ -27,6 +34,16 @@ defmodule Day13 do
       new_v = vertical_counts + find_vertical_line_of_reflection(pattern)
       new_h = horizontal_counts + find_horizontal_line_of_reflection(pattern)
       {new_v, new_h}
+    end)
+    |> then(fn {v, h} -> h * 100 + v end)
+  end
+
+  # - Problema 02
+  def part_02(input) do
+    input
+    |> Enum.reduce({0, 0}, fn pattern, {vertical_counts, horizontal_counts} ->
+      {new_v, new_h} = fix_smudge(pattern)
+      {new_v + vertical_counts, new_h + horizontal_counts}
     end)
     |> then(fn {v, h} -> h * 100 + v end)
   end
@@ -54,6 +71,52 @@ defmodule Day13 do
       List.flatten(rows)
     )
     |> Enum.into(%{})
+  end
+
+  # - Retorna o resultado do cálculo da parte 01
+  # com um ponto diferente do grid da parte 01
+  def fix_smudge(grid) do
+    points =
+      grid
+      |> Enum.map(fn {k, _v} -> k end)
+      |> Enum.sort()
+
+    fix_smudge(grid, points)
+  end
+
+  def fix_smudge(_grid, []), do: :error
+
+  def fix_smudge(grid, [point | remaining_points]) do
+    vertical_count = find_vertical_line_of_reflection(grid)
+    horizontal_count = find_horizontal_line_of_reflection(grid)
+
+    new_grid = flip_point(grid, point)
+
+    new_v =
+      case find_vertical_line_of_reflection(new_grid) do
+        [a, b] -> if a != vertical_count, do: a, else: b
+        x -> x
+      end
+
+    new_h =
+      case find_horizontal_line_of_reflection(new_grid) do
+        [a, b] -> if a != horizontal_count, do: a, else: b
+        x -> x
+      end
+
+    cond do
+      new_v == 0 and new_h == 0 -> fix_smudge(grid, remaining_points)
+      new_v != 0 and new_v != vertical_count -> {new_v, 0}
+      new_h != 0 and new_h != horizontal_count -> {0, new_h}
+      true -> fix_smudge(grid, remaining_points)
+    end
+  end
+
+  # - Muda o valor de um ponto do grid
+  def flip_point(grid, point) do
+    pt = if Map.get(grid, point) == ".", do: "#", else: "."
+
+    Map.put(grid, point, pt)
   end
 
   # - Recupera uma linha específica do grid
@@ -88,6 +151,7 @@ defmodule Day13 do
     case line_of_reflection do
       [[_a, b]] -> b
       [] -> 0
+      [[_a, b], [_c, d]] -> [b, d]
     end
   end
 
@@ -120,6 +184,7 @@ defmodule Day13 do
     case line_of_reflection do
       [[_a, b]] -> b
       [] -> 0
+      [[_a, b], [_c, d]] -> [b, d]
     end
   end
 
