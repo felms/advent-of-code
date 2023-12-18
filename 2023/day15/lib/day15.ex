@@ -16,6 +16,7 @@ defmodule Day15 do
     )
   end
 
+  # - Problema 01
   def part_01(input) do
     input
     |> String.replace("\n", "")
@@ -24,6 +25,7 @@ defmodule Day15 do
     |> Enum.sum()
   end
 
+  # - Gera o códido HASH de uma string
   def get_hash(input_string) do
     input_string
     |> String.graphemes()
@@ -34,5 +36,6 @@ defmodule Day15 do
     end)
   end
 
+  # - Recupera o códico ASCII de uma letra
   def get_ascii_code(letter), do: letter |> String.to_charlist() |> hd
 end
