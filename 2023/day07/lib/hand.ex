@@ -28,56 +28,17 @@ defmodule Hand do
   end
 
   defp categorize_hand(hand) do
-    cond do
-      five_of_a_kind?(hand) -> :five_of_a_kind
-      four_of_a_kind?(hand) -> :four_of_a_kind
-      three_of_a_kind?(hand) and one_pair?(hand) -> :full_house
-      three_of_a_kind?(hand) -> :three_of_a_kind
-      two_pair?(hand) -> :two_pair
-      one_pair?(hand) -> :one_pair
-      true -> :high_card
+    freqs = hand |> Enum.frequencies() |> Enum.map(fn {_k, v} -> v end) |> Enum.sort(:desc)
+
+    case freqs do
+      [5] -> :five_of_a_kind
+      [4, 1] -> :four_of_a_kind
+      [3, 2] -> :full_house
+      [3 | _] -> :three_of_a_kind
+      [2, 2, 1] -> :two_pair
+      [2 | _] -> :one_pair
+      _ -> :high_card
     end
-  end
-
-  defp five_of_a_kind?(hand) do
-    hand
-    |> Enum.map(fn card -> card.rank end)
-    |> Enum.frequencies()
-    |> Map.values()
-    |> Enum.member?(5)
-  end
-
-  defp four_of_a_kind?(hand) do
-    hand
-    |> Enum.map(fn card -> card.rank end)
-    |> Enum.frequencies()
-    |> Map.values()
-    |> Enum.member?(4)
-  end
-
-  defp three_of_a_kind?(hand) do
-    hand
-    |> Enum.map(fn card -> card.rank end)
-    |> Enum.frequencies()
-    |> Map.values()
-    |> Enum.member?(3)
-  end
-
-  defp two_pair?(hand) do
-    hand
-    |> Enum.map(fn card -> card.rank end)
-    |> Enum.frequencies()
-    |> Map.values()
-    |> Enum.sort(:desc)
-    |> then(&(&1 == [2, 2, 1]))
-  end
-
-  defp one_pair?(hand) do
-    hand
-    |> Enum.map(fn card -> card.rank end)
-    |> Enum.frequencies()
-    |> Map.values()
-    |> then(&(2 in &1))
   end
 
   def compare(%Hand{category: c1, cards: cd1}, %Hand{category: c2, cards: cd2}) do

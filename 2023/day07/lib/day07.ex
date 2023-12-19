@@ -18,7 +18,6 @@ defmodule Day07 do
       "\n==Part 01== \n\nResult: #{result}" <>
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
-
   end
 
   def parse_input(input_string) do
@@ -30,7 +29,7 @@ defmodule Day07 do
   def part_01(hands) do
     hands
     |> Enum.sort(Hand)
-    |> Enum.map(& (&1.bid))
+    |> Enum.map(& &1.bid)
     |> Enum.with_index(1)
     |> Enum.map(fn {bid, rank} -> bid * rank end)
     |> Enum.sum()
