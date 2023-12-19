@@ -10,7 +10,6 @@ defmodule Day07 do
       File.read!(input_file)
       # Para evitar problemas no Windows
       |> String.replace("\r", "")
-      |> parse_input()
 
     {time, result} = :timer.tc(&part_01/1, [input])
 
@@ -18,16 +17,32 @@ defmodule Day07 do
       "\n==Part 01== \n\nResult: #{result}" <>
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
+
+    {time, result} = :timer.tc(&part_02/1, [input])
+
+    IO.puts(
+      "\n==Part 02== \n\nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
-  def parse_input(input_string) do
+  # - Parte 01 do problema
+  def part_01(input_string) do
     input_string
     |> String.split("\n", trim: true)
     |> Enum.map(&Hand.new/1)
+    |> Enum.sort(Hand)
+    |> Enum.map(& &1.bid)
+    |> Enum.with_index(1)
+    |> Enum.map(fn {bid, rank} -> bid * rank end)
+    |> Enum.sum()
   end
 
-  def part_01(hands) do
-    hands
+  # - Parte 02 do problema
+  def part_02(input_string) do
+    input_string
+    |> String.split("\n", trim: true)
+    |> Enum.map(&Hand.new_02/1)
     |> Enum.sort(Hand)
     |> Enum.map(& &1.bid)
     |> Enum.with_index(1)
