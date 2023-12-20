@@ -18,6 +18,14 @@ defmodule Day16 do
       "\n==Part 01== \n\nResult: #{result}" <>
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
+
+    {time, result} = :timer.tc(&part_02/1, [input])
+
+    IO.puts(
+      "\n==Part 02== \n\nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
+
   end
 
   def parse_input(input_string) do
@@ -42,13 +50,58 @@ defmodule Day16 do
   # - Problema 01
   def part_01(grid) do
     starting_point = Beam.new({0, 0}, :east)
-    starting_state = State.new([starting_point], [])
+    starting_state = State.new([starting_point])
 
     resulting_state = run_simulation(starting_state, grid)
 
     resulting_state.energized_tiles
     |> Enum.uniq()
     |> Enum.count()
+  end
+
+  # - Problema 02
+  def part_02(grid) do
+
+    get_edge_beams(grid)
+    |> Enum.map(fn beam ->
+      starting_state = State.new([beam])
+
+      resulting_state = run_simulation(starting_state, grid)
+
+      resulting_state.energized_tiles
+      |> Enum.uniq()
+      |> Enum.count()
+    end)
+    |> Enum.max()
+
+  end
+
+  # - Gera os feixes de luz vindo
+  # dos quatro lados do grid.
+  def get_edge_beams(grid) do
+    max_r =
+      grid
+      |> Enum.map(fn {{r, _c}, _v} -> r end)
+      |> Enum.max()
+
+    max_c =
+      grid
+      |> Enum.map(fn {{_r, c}, _v} -> c end)
+      |> Enum.max()
+
+    upper_row =
+      for c <- 0..max_c, do: Beam.new({0, c}, :south)
+
+    bottom_row =
+      for c <- 0..max_c, do: Beam.new({max_r, c}, :north)
+
+    leftmost_column =
+      for r <- 0..max_r, do: Beam.new({r, 0}, :east)
+
+    rightmost_column =
+      for r <- 0..max_r, do: Beam.new({r, max_c}, :west)
+
+    upper_row ++ bottom_row ++ leftmost_column ++ rightmost_column
   end
 
   # - Roda a simulação

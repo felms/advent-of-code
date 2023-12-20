@@ -7,7 +7,7 @@ defmodule State do
   defstruct [:execution_queue, :energized_tiles, :processed_beams]
 
   # - Cria um novo estado
-  def new(execution_queue, energized_tiles, processed_beams \\ MapSet.new()) do
+  def new(execution_queue, energized_tiles \\ [], processed_beams \\ MapSet.new()) do
     %State{
       execution_queue: execution_queue,
       energized_tiles: energized_tiles,
