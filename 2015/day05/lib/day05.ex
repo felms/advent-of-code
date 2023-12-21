@@ -4,14 +4,12 @@ defmodule Day05 do
   """
 
   def run(input \\ "input.txt") do
-
     File.read!(input)
     # Para evitar problemas no Windows
     |> String.replace("\r", "")
     |> String.trim()
     |> String.split("\n")
     |> Enum.count(&is_nice?/1)
-
   end
 
   # Checks if a string is "nice"
