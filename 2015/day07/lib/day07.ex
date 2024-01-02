@@ -18,12 +18,31 @@ defmodule Day07 do
       "\n==Part 01== \n\nResult: #{result}" <>
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
+
+    {time, result} = :timer.tc(&part02/1, [input])
+
+    IO.puts(
+      "\n==Part 02== \n\nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   # - Problema 01
   def part01(input) do
-    input 
+    input
     |> execute_instructions(%{})
+    |> Enum.filter(fn {k, _v} -> k == "a" end)
+    |> hd()
+    |> then(fn {_k, v} -> v end)
+  end
+
+  # - Problema 02
+  def part02(input) do
+    a_value = part01(input)
+
+    input
+    |> Enum.reject(&String.match?(&1, ~r/(\d+)\s+->\s+b$/))
+    |> execute_instructions(%{"b" => a_value})
     |> Enum.filter(fn {k, _v} -> k == "a" end)
     |> hd()
     |> then(fn {_k, v} -> v end)
