@@ -1,0 +1,58 @@
+defmodule Day08 do
+  @moduledoc """
+  Dia 08 do Advent of Code de 2015
+  """
+
+  def run(mode \\ :real_input) do
+    input_file = if mode == :sample, do: "sample_input.txt", else: "input.txt"
+
+    input =
+      File.read!(input_file)
+      # Para evitar problemas no Windows
+      |> String.replace("\r", "")
+      |> String.split("\n", trim: true)
+
+    {time, result} = :timer.tc(&part01/1, [input])
+
+    IO.puts(
+      "\n==Part 01== \n\nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
+  end
+
+  # - Problema 01
+  def part01(input) do
+    input
+    |> Enum.map(&string_score/1)
+    |> Enum.sum()
+  end
+
+  def string_score(string) do
+    characters_of_code(string) - characters_in_memory(string)
+  end
+
+  def characters_of_code(string), do: string |> String.length()
+
+  def characters_in_memory(string) do
+    characters_in_memory(String.graphemes(string), :normal, 0)
+  end
+
+  def characters_in_memory([], _mode, count), do: count
+
+  def characters_in_memory(["\"" | remaining_chars], :normal, count) do
+    characters_in_memory(remaining_chars, :normal, count)
+  end
+
+  def characters_in_memory(["\\" | remaining_chars], :normal, count) do
+    characters_in_memory(remaining_chars, :escape, count)
+  end
+
+  def characters_in_memory(["x" | remaining_chars], :escape, count) do
+    [_, _ | rem_chars] = remaining_chars
+    characters_in_memory(rem_chars, :normal, count + 1)
+  end
+
+  def characters_in_memory([_ | remaining_chars], _mode, count) do
+    characters_in_memory(remaining_chars, :normal, count + 1)
+  end
+end
