@@ -14,3 +14,8 @@ For example:
 
 Starting with the digits in your puzzle input, apply this process 40 times. __What is _the length of the result__?
 
+--- Part Two ---
+
+Neat, right? You might also enjoy hearing [John Conway talking about this sequence](https://www.youtube.com/watch?v=ea7lJkEhytA) (that's Conway of __Conway's Game of Life__ fame).
+
+Now, starting again with the digits in your puzzle input, apply this process __50__ times. What is __the length of the new result__?

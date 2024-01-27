@@ -3,6 +3,8 @@ defmodule Day10 do
   Dia 10 do Advent of Code de 2015
   """
 
+  @regex ~r/(\d)\1*/
+
   def run() do
     input_file = "input.txt"
 
@@ -18,25 +20,23 @@ defmodule Day10 do
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
 
-    # {time, result} = :timer.tc(&part02/1, [input])
+    {time, result} = :timer.tc(&part02/1, [input])
 
-    # IO.puts(
-    #   "\n==Part 02== \n\nResult: #{result}" <>
-    #     "\nCalculated in #{time / 1_000_000} seconds\n"
-    # )
+    IO.puts(
+      "\n==Part 02== \n\nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   # - Problema 01
   def part01(input) do
-    execute_steps(input |> String.trim() |> String.to_integer(), 40)
-    |> Integer.to_string()
+    execute_steps(input |> String.trim(), 40)
     |> String.length()
   end
 
   # - Problema 02
   def part02(input) do
-    execute_steps(input |> String.trim() |> String.to_integer(), 50)
-    |> Integer.to_string()
+    execute_steps(input |> String.trim(), 50)
     |> String.length()
   end
 
@@ -48,29 +48,10 @@ defmodule Day10 do
   end
 
   def step(input) do
-    step(input |> Integer.digits(), [])
-    |> compress([])
-  end
-
-  def step([], digits), do: digits
-  def step([head | tail], []), do: step(tail, [{head, 1}])
-
-  def step([head | tail], digits) do
-    step(tail, combine_to_head(digits, head))
-  end
-
-  def combine_to_head([head | tail] = list, digit) do
-    {number, count} = head
-
-    cond do
-      number == digit -> [{number, count + 1} | tail]
-      true -> [{digit, 1} | list]
-    end
-  end
-
-  def compress([], number), do: number |> Integer.undigits()
-
-  def compress([{digit, count} | tail], number) do
-    compress(tail, [count, digit | number])
+    Regex.scan(@regex, input)
+    |> Enum.map(fn [digits, number] -> 
+       (digits |> String.length() |> Integer.to_string()) <> number
+    end)
+    |> Enum.join()
   end
 end
