@@ -157,9 +157,9 @@ defmodule Day11Test do
       assert Day11.next_valid_password("abcdefgh") == "abcdffaa"
     end
 
-    #test "ghijklmn" do
-    #  assert Day11.next_valid_password("ghijklmn") == "ghjaabcc"
-    #end
+    test "ghijklmn" do
+      assert Day11.next_valid_password("ghijklmn") == "ghjaabcc"
+    end
   end
 
 end
