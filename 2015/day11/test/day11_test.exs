@@ -161,5 +161,4 @@ defmodule Day11Test do
       assert Day11.next_valid_password("ghijklmn") == "ghjaabcc"
     end
   end
-
 end
