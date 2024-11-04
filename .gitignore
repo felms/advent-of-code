@@ -1,16 +1,16 @@
 # Elixir
 
-/_build
-/cover
-/deps
-/doc
-/.fetch
-erl_crash.dump
-*.ez
-*.beam
-/config/*.secret.exs
-.elixir_ls/
-20*/*/.formatter.exs
-20*/*/.gitignore
-20*/*/input.txt
-20*/*/test/*
+20*/*/day*/_build
+20*/*/day*/cover
+20*/*/day*/deps
+20*/*/day*/doc
+20*/*/day*/.fetch
+20*/*/day*/erl_crash.dump
+20*/*/day*/*.ez
+20*/*/day*/*.beam
+20*/*/day*/config/*.secret.exs
+20*/*/day*/config/.elixir_ls/
+20*/*/day*/.formatter.exs
+20*/*/day*/.gitignore
+20*/*/day*/input.txt
+20*/*/day*/test/*
