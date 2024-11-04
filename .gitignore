@@ -1,0 +1,16 @@
+# Elixir
+
+/_build
+/cover
+/deps
+/doc
+/.fetch
+erl_crash.dump
+*.ez
+*.beam
+/config/*.secret.exs
+.elixir_ls/
+20*/*/.formatter.exs
+20*/*/.gitignore
+20*/*/input.txt
+20*/*/test/*
