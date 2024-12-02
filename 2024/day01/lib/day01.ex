@@ -30,18 +30,15 @@ defmodule Day01 do
   def parse_input(input) do
     input
     |> String.split("\n", trim: true)
-    |> Enum.map(&String.split/1)
-    |> Enum.reduce([[], []], fn [a, b], [first_list, second_list] ->
-      [[String.to_integer(a) | first_list], [String.to_integer(b) | second_list]]
-    end)
-    |> then(fn [a, b] -> [Enum.sort(a), Enum.sort(b)] end)
+    |> Enum.map(fn line -> line |> String.split() |> Enum.map(&String.to_integer/1) end)
+    |> Enum.zip()
+    |> Enum.map(&(&1 |> Tuple.to_list() |> Enum.sort()))
   end
 
-  def part_01([first_list, second_list]) do
-    0..(length(first_list) - 1)
-    |> Enum.reduce(0, fn index, acc ->
-      acc + abs(Enum.at(first_list, index) - Enum.at(second_list, index))
-    end)
+  def part_01(lists) do
+    lists
+    |> Enum.zip()
+    |> Enum.reduce(0, fn {a, b}, acc -> acc + abs(a - b) end)
   end
 
   def part_02([first_list, second_list]) do
