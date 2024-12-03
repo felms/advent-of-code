@@ -35,3 +35,25 @@ So, in this example, __`2`__ reports are __safe__.
 
 Analyze the unusual data from the engineers. __How many reports are safe__?
 
+--- Part Two ---
+
+The engineers are surprised by the low number of safe reports until they realize they forgot to tell you about the Problem Dampener.
+
+The Problem Dampener is a reactor-mounted module that lets the reactor safety systems __tolerate a single bad level__ in what would otherwise be a safe report. It's like the bad level never happened!
+
+Now, the same rules apply as before, except if removing a single level from an unsafe report would make it safe, the report instead counts as safe.
+
+More of the above example's reports are now safe:
+
+- `7 6 4 2 1`: __Safe__ without removing any level.
+- `1 2 7 8 9`: __Unsafe__ regardless of which level is removed.
+- `9 7 6 2 1`: __Unsafe__ regardless of which level is removed.
+- `1 3 2 4 5`: __Safe__ by removing the second level, `3`.
+- `8 6 4 4 1`: __Safe__ by removing the third level, `4`.
+- `1 3 6 7 9`: __Safe__ without removing any level.
+
+Thanks to the Problem Dampener, __`4`__ reports are actually __safe__!
+
+Update your analysis by handling situations where the Problem Dampener can remove a single level from unsafe reports. __How many reports are now safe?__
+
+

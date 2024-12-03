@@ -19,6 +19,12 @@ defmodule Day02 do
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
 
+    {time, result} = :timer.tc(&part_02/1, [input])
+
+    IO.puts(
+      "\n==Part 02== \n\nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   def parse_input(input) do
@@ -27,9 +33,16 @@ defmodule Day02 do
     |> Enum.map(fn line -> line |> String.split() |> Enum.map(&String.to_integer/1) end)
   end
 
-  def part_01(input) do
-    input
-    |> Enum.count(&(safe_decreasing?(&1) || safe_increasing?(&1)))
+  def part_01(input), do: input |> Enum.count(&(safe_decreasing?(&1) || safe_increasing?(&1)))
+
+  def part_02(input), do: input |> Enum.count(&safe_with_tolerance?/1)
+
+  def safe_with_tolerance?(input) do
+    safe_increasing?(input) || safe_decreasing?(input) ||
+      0..(length(input) - 1)
+      |> Enum.any?(fn i -> input |> List.delete_at(i) |> safe_increasing? end) ||
+      0..(length(input) - 1)
+      |> Enum.any?(fn i -> input |> List.delete_at(i) |> safe_decreasing? end)
   end
 
   def safe_increasing?(report_line) do
