@@ -10,6 +10,7 @@ defmodule Day03 do
       File.read!(input_file)
       # Para evitar problemas no Windows
       |> String.replace("\r", "")
+      |> String.replace("\n", "") # Essa merda me fez perder meio dia (!!!)
 
     {time, result} = :timer.tc(&part_01/1, [input])
 
@@ -32,14 +33,9 @@ defmodule Day03 do
   end
 
   def part_02(input) do
-    [first | tail] = String.split(input, ~r/don't\(\)/)
-
-    rest =
-      tail
-      |> Enum.map(fn chunk -> chunk |> String.split(~r/do\(\)/) |> tl |> Enum.join("") end)
-
-    [first | rest]
-    |> Enum.join("")
+    Regex.scan(~r/^(.*?)don't\(\)|do\(\)(.*?)don't\(\)/, input)
+    |> Enum.map(fn [_ | rest] -> Enum.join(rest, "") end)
+    |> Enum.join()
     |> part_01
   end
 end
