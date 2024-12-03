@@ -1,18 +1,26 @@
 defmodule Day03 do
   @moduledoc """
-  Documentation for `Day03`.
+  Dia 03 do Advent of Code 2024
   """
 
-  @doc """
-  Hello world.
+  def run(mode \\ nil) do
+    input_file = if mode == :sample, do: "sample_input.txt", else: "input.txt"
 
-  ## Examples
+    input =
+      File.read!(input_file)
+      # Para evitar problemas no Windows
+      |> String.replace("\r", "")
 
-      iex> Day03.hello()
-      :world
+    {time, result} = :timer.tc(&part_01/1, [input])
 
-  """
-  def hello do
-    :world
+    IO.puts(
+      "\n==Part 01== \n\nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
+  end
+
+  def part_01(input) do
+    Regex.scan(~r/mul\((\d+),(\d+)\)/, input)
+    |> Enum.reduce(0, fn [_, a, b], acc -> acc + String.to_integer(a) * String.to_integer(b) end)
   end
 end
