@@ -20,18 +20,49 @@ defmodule Day04 do
       "\n==Part 01== \n\nResult: #{result}" <>
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
+
+    {time, result} = :timer.tc(&part_02/1, [input])
+
+    IO.puts(
+      "\n==Part 02== \n\nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   def part_01(puzzle) do
-    points =
-      Map.to_list(puzzle)
-      |> Enum.filter(fn {_point, letter} -> letter == "X" end)
-      |> Enum.map(fn {point, _letter} -> point end)
-
-    points
+    Map.to_list(puzzle)
+    |> Enum.filter(&(elem(&1, 1) == "X"))
+    |> Enum.map(&(elem(&1, 0)))
     |> Enum.reduce(0, fn point, acc ->
-      if Map.get(puzzle, point) == "X", do: count_at_point(point, puzzle) + acc, else: acc
+      count_at_point(point, puzzle) + acc
     end)
+  end
+
+  def part_02(puzzle) do
+    Map.to_list(puzzle)
+    |> Enum.filter(&(elem(&1, 1) == "A"))
+    |> Enum.map(&(elem(&1, 0)))
+    |> Enum.count(&mas_point?(&1, puzzle))
+  end
+
+  def mas_point?({r, c}, puzzle) do
+    mas_set = MapSet.new(["M", "A", "S"])
+
+    right_diag_set =
+      MapSet.new([
+        Map.get(puzzle, {r - 1, c - 1}, ""),
+        Map.get(puzzle, {r, c}, ""),
+        Map.get(puzzle, {r + 1, c + 1}, "")
+      ])
+
+    left_diag_set =
+      MapSet.new([
+        Map.get(puzzle, {r + 1, c - 1}, ""),
+        Map.get(puzzle, {r, c}, ""),
+        Map.get(puzzle, {r - 1, c + 1}, "")
+      ])
+
+    MapSet.equal?(mas_set, right_diag_set) && MapSet.equal?(mas_set, left_diag_set)
   end
 
   def count_at_point(point, puzzle) do
