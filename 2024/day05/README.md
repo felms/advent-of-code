@@ -77,3 +77,17 @@ Of course, you'll need to be careful: the actual list of __page ordering rules__
 
 Determine which updates are already in the correct order. __What do you get if you add up the middle page number from those correctly-ordered updates?__
 
+
+--- Part Two ---
+
+While the Elves get to work printing the correctly-ordered updates, you have a little time to fix the rest of them.
+
+For each of the __incorrectly-ordered updates__, use the page ordering rules to put the page numbers in the right order. For the above example, here are the three incorrectly-ordered updates and their correct orderings:
+
+- `75,97,47,61,53` becomes `97,75,47,61,53`.
+- `61,13,29` becomes `61,29,13`.
+- `97,13,75,29,47` becomes `97,75,47,29,13`.
+
+After taking __only the incorrectly-ordered updates__ and ordering them correctly, their middle page numbers are `47`, `29`, and `47`. Adding these together produces __`123`__.
+
+Find the updates which are not in the correct order. __What do you get if you add up the middle page numbers after correctly ordering just those updates?__
