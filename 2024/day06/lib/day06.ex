@@ -18,6 +18,13 @@ defmodule Day06 do
       "\n==Part 01== \n\nResult: #{result}" <>
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
+
+    {time, result} = :timer.tc(&part_02/1, [input])
+
+    IO.puts(
+      "\n==Part 02== \n\nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   def part_01(input) do
@@ -25,6 +32,16 @@ defmodule Day06 do
 
     exec_steps(pos, :up, input, MapSet.new([pos]), :ongoing)
     |> MapSet.size()
+  end
+
+  def part_02(input) do
+    pos = initial_pos(input)
+
+    exec_steps(pos, :up, input, MapSet.new([pos]), :ongoing)
+    |> Enum.filter(&(Map.get(input, &1) == "."))
+    |> Enum.filter(
+      &(exec_steps_02(pos, :up, Map.put(input, &1, "#"), MapSet.new([{pos, :up}]), :ongoing) == :found_loop))
+    |> length
   end
 
   def parse_input(input) do
@@ -59,6 +76,22 @@ defmodule Day06 do
       exec_steps(current_pos, direction, grid, visited_positions, :finished)
     else
       exec_steps(next_pos, next_dir, grid, MapSet.put(visited_positions, next_pos), :ongoing)
+    end
+  end
+
+  def exec_steps_02(current_pos, direction, grid, visited_positions, :ongoing) do
+    {next_pos, next_dir} = find_next_position(current_pos, direction, grid)
+
+    cond do
+      Map.get(grid, next_pos, :outside) == :outside -> :finished
+      MapSet.member?(visited_positions, {next_pos, next_dir}) -> :found_loop
+      true -> exec_steps_02(
+          next_pos,
+          next_dir,
+          grid,
+          MapSet.put(visited_positions, {next_pos, next_dir}),
+          :ongoing
+        )
     end
   end
 
