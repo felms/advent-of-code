@@ -18,12 +18,28 @@ defmodule Day07 do
       "\n==Part 01== \n\nResult: #{result}" <>
         "\nCalculated in #{time / 1_000_000} seconds\n"
     )
+
+    {time, result} = :timer.tc(&part_02/1, [input])
+
+    IO.puts(
+      "\n==Part 02== \n\nResult: #{result}" <>
+        "\nCalculated in #{time / 1_000_000} seconds\n"
+    )
   end
 
   def part_01(input) do
     input
     |> Enum.filter(fn {test_value, [first_number | numbers]} ->
       can_be_made_true?(test_value, numbers, first_number)
+    end)
+    |> Enum.map(&elem(&1, 0))
+    |> Enum.sum()
+  end
+
+  def part_02(input) do
+    input
+    |> Enum.filter(fn {test_value, [first_number | numbers]} ->
+      can_be_made_true_02?(test_value, numbers, first_number)
     end)
     |> Enum.map(&elem(&1, 0))
     |> Enum.sum()
@@ -54,5 +70,19 @@ defmodule Day07 do
   def can_be_made_true?(test_value, [current_number | numbers], current_value) do
     can_be_made_true?(test_value, numbers, current_number * current_value) ||
       can_be_made_true?(test_value, numbers, current_number + current_value)
+  end
+
+  def can_be_made_true_02?(test_value, numbers_list, current_value)
+  def can_be_made_true_02?(x, [], x), do: true
+  def can_be_made_true_02?(_, [], _), do: false
+
+  def can_be_made_true_02?(test_value, [current_number | numbers], current_value) do
+    can_be_made_true_02?(test_value, numbers, current_number * current_value) ||
+      can_be_made_true_02?(test_value, numbers, current_number + current_value) ||
+      can_be_made_true_02?(test_value, numbers, concat_numbers(current_value, current_number))
+  end
+
+  def concat_numbers(number0, number1) do
+    "#{number0}#{number1}" |> String.to_integer()
   end
 end
